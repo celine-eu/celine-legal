@@ -1,0 +1,11 @@
+{% extends "page/base.html.j2" %}
+{% block title %}{{ w.catalogue }}{% endblock %}
+{% block body %}
+<h1>{{ w.catalogue }}</h1>
+<p class="note">{{ w.catalogueNote }}</p>
+<ul class="listing">
+{% for page in view.pages %}
+<li><a href="{{ page.path | u }}">{{ page.title }}</a> <span class="meta">{{ page.owners | join(", ") }} · {{ page.version }} · {{ page.lang }} · {{ w.signature if page.acceptance == "signature" else page.status }}</span></li>
+{% endfor %}
+</ul>
+{% endblock %}

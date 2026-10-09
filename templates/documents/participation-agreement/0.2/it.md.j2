@@ -1,0 +1,111 @@
+---
+document: participation-agreement
+agreement_id: {{ roles.dataspace }}-participation
+scope: dataspace
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+capacity: independent_controller
+---
+{% set dataspace = parties[roles.dataspace] %}
+
+# Accordo di partecipazione allo spazio dati
+
+**Spazio dati {{ project.name }}, pilota {{ dataspace.short }} — versione {{ doc.version }}**
+
+## 1. Finalità
+
+Il presente accordo disciplina la partecipazione di un'organizzazione allo spazio dati
+{{ project.name }} per il pilota {{ dataspace.short }}. Nello spazio dati le parti ammesse ottengono due tipi di dati
+relativi ai membri di una comunità energetica rinnovabile:
+
+- i dati di misura;
+- i dati energetici da essi derivati.
+
+Li ottengono solo in base alle offerte di condivisione pubblicate nello spazio dati e
+solo sulla base delle decisioni di tali membri.
+
+Il progetto {{ project.name }} è finanziato dall'Unione europea nell'ambito del programma {# the source line wraps inside the programme name #}{{ project.programme | replace(" ", "\n", 1) }}, accordo di sovvenzione n. {{ project.grant_agreement }}.
+
+## 2. Accettazione
+
+Un'organizzazione partecipa dopo aver accettato questa versione dell'accordo tramite il
+registro delle identità dello spazio dati. Il registro conserva:
+
+- chi ha accettato, quando e in quale lingua;
+- l'impronta del testo accettato.
+
+Solo un'organizzazione che ha accettato l'accordo riceve le credenziali necessarie per
+partecipare.
+
+## 3. Qualifica
+
+L'organizzazione partecipante agisce come **titolare autonomo del trattamento**.
+Determina le finalità per le quali tratta i dati che riceve. Di conseguenza:
+
+- non è coperta da una comunicazione effettuata riguardo a un'altra parte;
+- la decisione di ciascun membro è richiesta per essa in proprio, per ciascuna finalità
+  cui partecipa.
+
+Un'organizzazione che tratta dati per conto di un'altra parte accetta un accordo
+distinto che indica tale qualifica.
+
+## 4. Gestione dello spazio dati
+
+{{ platform.name }} gestisce, per conto di ciascun partecipante, il suo nodo nello spazio
+dati: il connettore, l'identità e il registro dei consensi. Agisce come responsabile del
+trattamento, in base a un accordo sul trattamento dei dati con ciascun partecipante.
+
+Lo spazio dati funziona su infrastrutture nello Spazio economico europeo:
+
+- {{ providers.hosting.brand }}, nell'Unione europea;
+- l'infrastruttura propria di {{ platform.short }} a {{ platform.city }}.
+
+## 5. Obblighi
+
+Ciascuna organizzazione partecipante:
+
+- **Finalità:** tratta i dati solo per le finalità dichiarate nelle offerte di
+  condivisione cui è ammessa, e solo finché vi è ammessa.
+- **Revoca:** rispetta ogni revoca della decisione di un membro.
+  - Dal momento in cui la revoca è registrata non ottiene più nulla per quel membro.
+  - Entro 7 giorni lo esclude da ogni esportazione e da ogni nuova elaborazione.
+- **Conservazione:** conserva i dati riferiti ai singoli membri non oltre la durata
+  dichiarata da ciascuna offerta.
+- **Sicurezza:** adotta misure tecniche e organizzative di sicurezza adeguate ai dati di
+  consumo energetico, che possono rivelare le abitudini domestiche.
+- **Assistenza:** assiste gli altri partecipanti nel rispondere alle richieste degli
+  interessati.
+- **Violazioni:** comunica ai partecipanti interessati, entro 48 ore da quando ne viene a
+  conoscenza, ogni violazione di dati personali che riguardi dati ottenuti nello spazio
+  dati.
+- **Comunicazione a terzi:** comunica i dati a terzi solo a una parte che abbia a sua
+  volta accettato un accordo in questo spazio dati, e solo dove un'offerta di
+  condivisione lo consente.
+
+## 6. Provenienza e prove
+
+Ogni comunicazione è registrata nello spazio dati, per punto di prelievo, con la data
+della decisione del membro.
+
+- **Su che cosa si basa il partecipante:** quella registrazione, come prova della base
+  per ottenere i dati.
+- **Che cosa non è una prova:** la presenza di un punto di prelievo in un elenco non
+  costituisce mai, di per sé, una base.
+
+## 7. Durata e versioni
+
+Il presente accordo si applica per la durata del pilota {{ project.name }}.
+
+Una nuova versione dell'accordo:
+
+- sostituisce questa solo per l'organizzazione che la accetta;
+- non è mai estesa per effetto dell'accettazione di una versione precedente.
+
+L'organizzazione che non accetta una nuova versione cessa di ricevere dati in base ad
+essa.
+
+## 8. Legge applicabile e controversie
+
+Il presente accordo è regolato dalla legge italiana. Per ogni controversia che ne derivi
+è competente in via esclusiva il foro di {{ dataspace.forum.it }}.

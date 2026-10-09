@@ -1,0 +1,41 @@
+# The optional features these templates describe. A text says what the platform does: a
+# feature a deployment has switched off must not be described, and one it has on must be.
+#
+# Each feature here is read by the templates as `features.<name>` (true or false). A
+# deployment declares every one in its `register.yaml` (`features:`), and may override one
+# with `LEGAL_FEATURE_<NAME>=true|false`. A feature not listed here cannot be declared or
+# switched: adding one is a change to this file and to the templates that describe it,
+# together (templates/README.md, "Adding a feature").
+#
+#   description  what the feature is, as the texts describe it
+#   mirrors      the application setting whose effective value it must equal
+#   documents    templates that exist only with the feature: with it off, a register entry
+#                using one is left out (with its slots), and the host logs it
+
+features:
+  sms_verification:
+    description: the member's phone number is verified with a one-time code sent by SMS
+    mirrors: onboarding phone_verification_enabled (SMS_PROVIDER a dev provider, or brevo with DPA_SMS_SIGNED)
+
+  document_extraction:
+    description: >-
+      the member uploads a bill or identity document, and a language model reads it and
+      fills in the application
+    mirrors: onboarding document_processing_enabled (EXTRACTION_ENABLED with LLM_BASE_URL and LLM_VISION_MODEL); upload follows it
+
+  ai_assistant:
+    description: the community app has an AI assistant
+    mirrors: no switch yet; on wherever the ai-assistant release is installed and the app links it
+
+  dso_data_exchange:
+    description: meter readings are obtained from the grid operator through the dataspace
+    mirrors: >-
+      onboarding DATASPACE_ENABLED (consent at application), and celine-webapp data_sharing_ready
+      (DATA_SHARING_ENABLED with ONBOARDING_API_URL: the in-app screen where members change their
+      choices, which the texts promise); both on, or the texts promise what one of them cannot do
+    documents:
+      - consent-texts
+      - data-sharing-privacy-notice
+      - data-sharing-agreement
+      - dso-data-processing-agreement
+      - participation-agreement

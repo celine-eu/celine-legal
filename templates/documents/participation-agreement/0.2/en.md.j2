@@ -1,0 +1,109 @@
+---
+document: participation-agreement
+agreement_id: {{ roles.dataspace }}-participation
+scope: dataspace
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+capacity: independent_controller
+---
+{% set dataspace = parties[roles.dataspace] %}
+
+# Dataspace participation agreement
+
+**{{ project.name }} dataspace, {{ dataspace.short }} pilot — version {{ doc.version }}**
+
+## 1. Purpose
+
+This agreement governs an organisation's participation in the {{ project.name }} dataspace for the
+{{ dataspace.short }} pilot. In the dataspace, admitted parties obtain two kinds of data relating to the
+members of a renewable energy community:
+
+- metering data;
+- energy data derived from it.
+
+They obtain it only under the sharing offers published in the dataspace, and only on
+the basis of those members' decisions.
+
+The {{ project.name }} project is funded by the European Union under the {{ project.programme }} programme,
+grant agreement No. {{ project.grant_agreement }}.
+
+## 2. Accepting the agreement
+
+An organisation participates once it has accepted this version of the agreement through
+the dataspace's identity registry. The registry records:
+
+- who accepted, when, and in which language;
+- the fingerprint of the text accepted.
+
+Only an organisation that has accepted the agreement receives the credentials needed to
+take part.
+
+## 3. Capacity
+
+The participating organisation acts as an **independent controller**. It determines the
+purposes for which it processes the data it receives. Consequently:
+
+- it is not covered by a disclosure made about another party;
+- each member's decision is sought for it in its own right, for each purpose it takes
+  part in.
+
+An organisation that processes data on behalf of another party accepts a separate
+agreement stating that capacity.
+
+## 4. Operation of the dataspace
+
+{{ platform.name }} operates each participant's dataspace node on that participant's
+behalf. This covers the connector, the identity and the consent record. {{ platform.short }}
+acts as processor under a data processing agreement with each participant.
+
+The dataspace runs on infrastructure in the European Economic Area:
+
+- {{ providers.hosting.brand }}, in the European Union;
+- {{ platform.short }}{{ "'" if platform.short.endswith('s') else "'s" }} own infrastructure in {{ platform.city }}, {{ platform.country.en }}.
+
+## 5. Obligations
+
+Each participating organisation:
+
+- **Purpose:** processes data only for the purposes declared in the sharing offers to
+  which it has been admitted, and only for as long as it is admitted.
+- **Withdrawal:** honours every withdrawal of a member's decision.
+  - It obtains nothing further for that member from the moment the withdrawal is
+    recorded.
+  - It leaves the member out of every export and every new processing within 7 days.
+- **Retention:** keeps member-level data no longer than the retention each offer
+  declares.
+- **Security:** maintains technical and organisational security measures appropriate to
+  energy consumption data, which can reveal household behaviour.
+- **Assistance:** assists the other participants in meeting data-subject requests.
+- **Breaches:** notifies the participants concerned of a personal-data breach affecting
+  data obtained in the dataspace within 48 hours of becoming aware of it.
+- **Onward disclosure:** discloses data onward only to a party that has itself accepted
+  an agreement in this dataspace, and only where a sharing offer admits it.
+
+## 6. Provenance and evidence
+
+Each disclosure is recorded in the dataspace, per supply point, with the date of the
+member's decision.
+
+- **What a participant relies on:** that record, as its evidence of the basis for
+  obtaining the data.
+- **What is not evidence:** the presence of a supply point in a list is never a basis
+  in itself.
+
+## 7. Term and versions
+
+This agreement applies for the duration of the {{ project.name }} pilot.
+
+A new version of the agreement:
+
+- replaces this one only for an organisation that accepts it;
+- is never carried forward by the acceptance of an earlier version.
+
+An organisation that does not accept a new version stops receiving data under it.
+
+## 8. Law and disputes
+
+This agreement is governed by Italian law. The courts of {{ dataspace.forum.en }} have exclusive
+jurisdiction over any dispute arising from it.

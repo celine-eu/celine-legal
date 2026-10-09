@@ -1,0 +1,328 @@
+---
+document: app-privacy-notice
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Informativa privacy — piattaforma digitale della comunità {{ rec.short }}
+
+**Informativa ai sensi dell'art. 13 del Regolamento (UE) 2016/679 (GDPR) — versione {{ doc.version }}**
+
+Questa informativa riguarda la piattaforma digitale di {{ rec.short }}:
+
+- la domanda di adesione online;
+- l'app della comunità, {% if features.ai_assistant %}compresi l'assistente AI e le notifiche{% else %}comprese le notifiche{% endif %};
+- il servizio di accesso.
+
+Per il rapporto sociale resta valida l'informativa generale di {{ rec.short }} per i soci.
+{% if features.dso_data_exchange %}
+La condivisione facoltativa delle misure del contatore è descritta nell'informativa
+«Condivisione dei tuoi dati di misura».
+{% endif %}
+
+## 1. Chi è responsabile
+
+{% filter wordwrap(88) %}
+Il titolare del trattamento è **{{ rec.name }}**.
+{%- endfilter +%}
+
+- Sede: {{ rec.registered_office }}.
+- C.F. e P.IVA: {{ rec.tax_code }}.
+- PEC: {{ rec.pec }}.
+- Contatto privacy: **{{ rec.privacy_contact }}**.
+- Responsabile della protezione dei dati: {{ rec.dpo }}.
+
+{{ rec.short }} ha affidato la gestione della piattaforma a **{{ platform.name }}**, {{ platform.registered_office }}, che
+tratta i tuoi dati per conto di {{ rec.short }} e secondo le sue istruzioni, come responsabile
+del trattamento (art. 28 GDPR).
+
+## 2. Quali dati, e perché
+
+### 2.1 La domanda di adesione
+
+**Che cosa raccogliamo:**
+
+- nome e cognome, codice fiscale, email e telefono;
+- indirizzo e codice POD del punto di fornitura;
+- le informazioni che fornisci sull'immobile e sui tuoi impianti (fotovoltaico, batteria,
+  auto elettrica, pompa di calore);
+{% if features.document_extraction %}
+- le tue scelte nella pagina dei consensi;
+- se scegli di caricarle, la copia di una bolletta elettrica e del tuo documento
+  d'identità.
+{% else %}
+- le tue scelte nella pagina dei consensi.
+{% endif %}
+
+**Che cosa ne facciamo:**
+
+{% if features.sms_verification %}
+- Verifichiamo il numero di telefono con un codice inviato via SMS.
+{% endif %}
+{% if features.document_extraction %}
+- Se carichi una bolletta o un documento d'identità, un modello di intelligenza
+  artificiale lo legge e compila il modulo al posto tuo. Dalla bolletta legge solo nome,
+  codice fiscale, codice POD, indirizzo di fornitura e comune. Dal documento d'identità
+  legge solo nome, codice fiscale e data di scadenza del documento. Prima di inviare la
+  domanda controlli e correggi ciò che ha letto. Il modello è un modello a pesi aperti
+  su un server di proprietà di {{ platform.short }} a {{ platform.city }}. I documenti **non** sono inviati a
+  fornitori esterni di intelligenza artificiale e **non** sono usati per addestrare
+  modelli.
+- Le copie che carichi sono conservate cifrate, perché il personale di {{ rec.short }} possa
+  verificare la domanda. Sono cancellate dalla piattaforma quando il tuo account viene
+  attivato. Resta la registrazione del fatto che {{ rec.short }} ha verificato la tua
+  identità, e di come lo ha fatto.
+{% endif %}
+- Controlliamo l'indirizzo di fornitura rispetto alle aree delle configurazioni della
+  comunità, per stabilire a quale configurazione appartieni.
+- La domanda è esaminata dal personale di {{ rec.short }}. L'ammissione è decisa da una
+  persona.
+- Se un dato che hai indicato risulta sbagliato (ad esempio il codice POD), {{ rec.short }}
+  lo corregge. Conserva traccia del valore precedente e di chi ha fatto la correzione.
+
+**Base giuridica:**
+
+- misure precontrattuali richieste da te (art. 6, par. 1, lett. b GDPR);
+- obblighi di legge sulle comunità energetiche rinnovabili, D.Lgs. 199/2021 (lett. c).
+
+**Controllo automatico dell'area:** se dal controllo l'indirizzo risulta fuori dalle aree
+della comunità, la domanda non può proseguire. Puoi scrivere al contatto privacy per far
+riesaminare il controllo da una persona.
+
+### 2.2 Il tuo account
+
+**Che cosa conserviamo:**
+
+- nome utente, email, nome e lingua preferita;
+- la registrazione dei tuoi accessi.
+
+**Perché:** per darti un accesso sicuro alla piattaforma.
+
+**Base giuridica:**
+
+- le condizioni d'uso della piattaforma (lett. b);
+- per la registrazione degli accessi, il legittimo interesse di {{ rec.short }} alla sicurezza
+  della piattaforma (lett. f).
+
+### 2.3 L'app della comunità
+
+**Che cosa usiamo:**
+
+- i dati energetici dei contatori e dei dispositivi registrati a tuo nome nella comunità;
+- previsioni e stime ricavate da quei dati;
+- le tue risposte ai suggerimenti, i tuoi impegni e i tuoi punti;
+- le impostazioni dell'app.
+
+**Perché:**
+
+- per mostrarti consumi e produzione;
+- per mostrarti previsioni, suggerimenti per spostare i consumi, punti e badge.
+
+**Base giuridica:** il rapporto sociale e il regolamento della comunità (lett. b).
+
+**Come sono calcolati suggerimenti e punti:** in modo automatico dai tuoi dati
+energetici.
+
+- Sono solo suggerimenti.
+- Non hanno effetti giuridici su di te.
+- Non cambiano quanto {{ rec.short }} ti riconosce.
+
+**Le classifiche** mostrano solo la tua posizione, mai il tuo nome.
+
+### 2.4 Le notifiche
+
+**Che cosa usiamo:**
+
+- le tue preferenze di notifica;
+- la tua email;
+- l'indirizzo tecnico che il browser ci fornisce quando autorizzi le notifiche push;
+- la registrazione delle notifiche consegnate, lette e aperte.
+
+**Perché:** per inviarti notifiche sulla tua energia e sulla comunità. Le notifiche sono
+scelte da regole sui tuoi dati energetici, al massimo poche al giorno.
+
+**Il tuo controllo:**
+
+- Puoi disattivare ogni tipo di notifica nelle impostazioni dell'app.
+- Gli avvisi meteo non si possono disattivare.
+
+**Base giuridica:** le condizioni d'uso (lett. b).
+
+{% set skip = 0 if features.ai_assistant else 1 %}
+{% if features.ai_assistant %}
+### 2.5 L'assistente AI
+
+**Che cosa usiamo:**
+
+- i messaggi che scrivi;
+- i file che alleghi;
+- le risposte prodotte;
+- le informazioni che l'assistente legge per risponderti, con i tuoi stessi permessi: i
+  tuoi dati energetici, il tuo rapporto con la comunità, i tuoi impegni e il meteo.
+
+**Che cos'è l'assistente:** un sistema di intelligenza artificiale. Le sue risposte
+possono essere sbagliate.
+
+**Dove funziona:**
+
+- {% filter wordwrap(86) | indent(2) %}
+un modello linguistico a pesi aperti su un server di proprietà di {{ platform.short }} a {{ platform.city }};
+{%- endfilter +%}
+- le tue conversazioni sono conservate sulla piattaforma.
+
+**Che cosa succede alle tue conversazioni:**
+
+- **Non** sono inviate a fornitori esterni di intelligenza artificiale.
+- **Non** sono usate per addestrare modelli.
+
+**Base giuridica:** le condizioni d'uso, per una funzione che scegli di usare (lett. b).
+
+**Ti chiediamo di non** allegare documenti d'identità né dati personali di altre persone.
+
+{% endif %}
+### 2.{{ 6 - skip }} Le segnalazioni (feedback)
+
+**Che cosa usiamo:** quando invii una segnalazione, il voto e il commento, con alcuni
+dati tecnici:
+
+- la pagina;
+- il browser e le dimensioni dello schermo;
+- l'indirizzo IP;
+- **un'immagine della pagina su cui ti trovavi**.
+
+**Base giuridica:** il legittimo interesse di {{ rec.short }} a migliorare la piattaforma
+(lett. f).
+
+L'invio è facoltativo. Controlla che cosa c'è sullo schermo prima di inviare.
+
+### 2.{{ 7 - skip }} La registrazione di ciò che hai accettato e scelto
+
+**Che cosa conserviamo:**
+
+- quale versione di ogni documento hai accettato o letto, e quando;
+- l'indirizzo IP da cui lo hai fatto;
+- ogni consenso dato o revocato, con il testo che ti è stato mostrato.
+
+**Base giuridica:** l'obbligo di {{ rec.short }} di poterlo dimostrare (artt. 5, par. 2, e 7,
+par. 1 GDPR; lett. c).
+
+### 2.{{ 8 - skip }} Aggiornamenti da {{ rec.short }}
+
+Se hai chiesto di essere tenuto aggiornato, usiamo la tua email per inviarti notizie
+sulla comunità.
+
+**Base giuridica:** il tuo consenso (lett. a). Puoi revocarlo in ogni momento, dal link
+presente in ogni messaggio o scrivendo al contatto privacy.
+
+## 3. È obbligatorio fornire i dati?
+
+I dati ai punti 2.1 e 2.2 servono per chiedere l'adesione e usare la piattaforma.
+{% if features.document_extraction %}
+Caricare una bolletta o un documento d'identità non è obbligatorio: puoi scrivere tu
+gli stessi dati. Anche il resto dipende da te:
+{% else %}
+Il resto dipende da te:
+{% endif %}
+
+- notifiche;
+{% if features.ai_assistant %}
+- assistente;
+{% endif %}
+- segnalazioni;
+- aggiornamenti.
+
+## 4. Chi riceve i tuoi dati
+
+- **{{ platform.short }}** gestisce la piattaforma per {{ rec.short }}, come responsabile del
+  trattamento.
+- **I sub-responsabili di {{ platform.short }}**, indicati nell'elenco dei sub-responsabili
+  della piattaforma:
+  - {{ providers.hosting.name }}, per l'hosting nell'Unione europea;
+  - un fornitore di invio email {{ providers.email.name }};
+{% if features.sms_verification %}
+  - {{ providers.sms.name }} ({{ providers.sms.country.it }}), per gli SMS di verifica.
+{% endif %}
+- **{{ providers.maps.name }}**: riceve l'indirizzo di fornitura per localizzarlo sulla
+  mappa, senza il tuo nome.
+- **Il personale di {{ rec.short }}**, nei limiti del proprio ruolo:
+  - l'elenco dei soci mostra ai gestori della comunità il tuo nome, i tuoi contatori e i
+    consumi aggregati.
+- **Il GSE** e gli altri destinatari indicati nell'informativa generale di {{ rec.short }} per
+  i soci, per la gestione della comunità.
+
+I tuoi dati non sono diffusi né venduti.
+
+## 5. Dove sono trattati i tuoi dati
+
+La piattaforma funziona su {{ providers.hosting.brand }} nell'Unione europea e sull'infrastruttura
+propria di {{ platform.short }} a {{ platform.city }}. I tuoi dati sono trattati nello
+Spazio economico europeo.
+
+La {{ providers.maps.name }} ha sede nel {{ providers.maps.country.it }}. Il {{ providers.maps.country.it }} è coperto da una
+decisione di adeguatezza della Commissione europea.
+
+## 6. Per quanto tempo li conserviamo
+
+| Dati | Conservati per |
+|---|---|
+| Domanda non accolta o ritirata | 12 mesi dalla decisione |
+| Domanda del socio ammesso, account, dati dell'app | Per la durata del rapporto sociale, poi come indicato nell'informativa generale di {{ rec.short }} per i soci (5 anni dalla cessazione) |
+{% if features.document_extraction %}
+| Copie della bolletta e del documento d'identità caricate con la domanda | Fino all'attivazione del tuo account. Per una domanda non accolta, come la domanda |
+{% endif %}
+{% if features.sms_verification %}
+| Codici di verifica SMS | 24 ore |
+{% endif %}
+| Registrazioni di accesso e di sicurezza | 12 mesi |
+| Notifiche e registrazioni di consegna | 12 mesi |
+{% if features.ai_assistant %}
+| Conversazioni e allegati dell'assistente AI | Finché non li cancelli, e al massimo 12 mesi dall'ultimo messaggio |
+{% endif %}
+| Segnalazioni, comprese le immagini | 12 mesi |
+| Registrazioni di accettazioni e consensi | Per la durata del rapporto sociale e 5 anni dalla sua cessazione o dalla revoca del consenso |
+| Email per gli aggiornamenti | Fino alla revoca del consenso |
+
+## 7. Cookie e memoria locale
+
+La piattaforma usa solo ciò che serve a funzionare:
+
+- un **cookie di sessione**, che ti mantiene collegato e viene eliminato quando esci o
+  la sessione scade;
+- la **memoria locale** del browser, per la lingua e il tema chiaro o scuro.
+
+Non usiamo cookie di analisi, pubblicità o profilazione, quindi non ti chiediamo il
+consenso ai cookie.
+
+## 8. I tuoi diritti
+
+Puoi chiedere a {{ rec.short }}:
+
+- l'accesso ai tuoi dati;
+- la rettifica o la cancellazione;
+- la limitazione del trattamento;
+- la portabilità dei dati che hai fornito.
+
+Puoi anche opporti ai trattamenti basati sul legittimo interesse (artt. 15–22 GDPR).
+
+**Come chiedere:** scrivi a **{{ rec.privacy_contact }}**. Riceverai risposta
+entro un mese.
+
+**Nell'app** puoi da solo:
+
+{% if features.ai_assistant %}
+- cancellare le conversazioni e gli allegati dell'assistente;
+{% endif %}
+- modificare le notifiche{{ ';' if features.dso_data_exchange else '.' }}
+{% if features.dso_data_exchange %}
+- cambiare le scelte di condivisione dei dati.
+{% endif %}
+
+Puoi anche proporre reclamo al Garante per la protezione dei dati personali, Piazza
+Venezia 11, 00187 Roma, www.garanteprivacy.it.
+
+## 9. Modifiche
+
+Quando questa informativa cambia, la piattaforma ti mostra la nuova versione al primo
+accesso successivo. Versione e data sono indicate in testa all'informativa.

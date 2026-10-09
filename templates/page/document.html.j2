@@ -1,0 +1,37 @@
+{% extends "page/base.html.j2" %}
+{% from "page/_macros.html.j2" import name %}
+{% block title %}{{ view.title }}{% endblock %}
+{% block body %}
+<header class="doc-meta">
+{% if view.organisation %}<span>{{ name(view.organisation) }}</span>{% endif %}
+<span>{{ w.version }} {{ view.version }} · {% if view.published_at %}{{ w.published }} {{ view.published_at | date(lang) }}{% else %}{{ w.notPublished }}{% endif %}{% if mode != "final" %} · {{ view.document_status }}{% endif %}</span>
+{% if view.langs | length > 1 %}
+<nav aria-label="lang">
+{% for other in view.langs %}{% if other.lang == view.lang %}<strong>{{ other.lang | upper }}</strong>{% else %}<a href="{{ other.url | u }}" hreflang="{{ other.lang }}">{{ other.lang | upper }}</a>{% endif %}
+{% endfor %}
+</nav>
+{% endif %}
+</header>
+{% if not view.is_current and view.url %}
+<p class="banner old">{{ w.notCurrent }} <a href="{{ view.url | u }}">{{ w.readCurrent }}</a></p>
+{% endif %}
+<article lang="{{ view.lang }}">
+{{ view.html | safe }}
+</article>
+<footer class="doc-foot">
+{% if view.versions | length > 1 %}
+<h2>{{ w.versions }}</h2>
+<ul class="listing">
+{% for v in view.versions %}
+<li><a href="{{ v.url | u }}">{{ v.version }}</a> <span class="meta">{% if v.published_at %}{{ v.published_at | date(lang) }}{% else %}{{ w.notPublished }}{% endif %}{% if v.version == view.current_version %} · {{ w.current }}{% endif %}</span></li>
+{% endfor %}
+</ul>
+{% endif %}
+{% if view.sha256 %}
+<p class="meta">{{ w.sha }}: <a href="{{ view.text | u }}"><code>{{ view.sha256 }}</code></a></p>
+{% endif %}
+{% if view.approval_sha256 and view.document_status != "final" %}
+<p class="meta" data-approval>{{ w.approval }}: <code>{{ view.approval_sha256 }}</code></p>
+{% endif %}
+</footer>
+{% endblock %}

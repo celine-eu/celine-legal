@@ -1,0 +1,209 @@
+{% import 'macros/text.j2' as text %}
+{% import 'macros/durations.j2' as durations %}
+{#- The choices are the community's consent texts: the accesses (offers that require no
+    other) first, then the uses, each in the consent texts' order. -#}
+{% set ns = namespace(access=[], uses=[]) %}
+{% for id in consent_texts.texts %}
+{% if offers_by_id[id].get('requires_offers') %}{% set ns.uses = ns.uses + [id] %}{% else %}{% set ns.access = ns.access + [id] %}{% endif %}
+{% endfor %}
+{% set choices = ns.access + ns.uses %}
+{% set receivers = [] %}
+{% for id in ns.access %}
+{% set _ = receivers.append(party_by_alias[offers_by_id[id].recipients.recipient].short) %}
+{% endfor %}
+{% set first = offers_by_id[choices[0]] %}
+{% macro recipient(id) %}{{ party_by_alias[offers_by_id[id].recipients.recipient].short }}{% endmacro %}
+{#- How the table names a use that depends on an access, by purpose. -#}
+{% macro noun(offer) %}
+{%- set r = party_by_alias[offer.recipients.recipient] -%}
+{%- if offer.purpose == 'FlexibilityResearch' -%}la sperimentazione sulla flessibilità
+{%- elif offer.purpose == 'IncentiveEstimation' -%}la stima dell'incentivo
+{%- elif offer.purpose == 'EnergyForecasting' -%}la ricerca e i modelli di previsione di {{ r.short }}
+{%- else -%}{{ no_wording_for_purpose[offer.purpose] }}
+{%- endif -%}
+{% endmacro %}
+{% macro dependents(access) %}
+{%- set d = namespace(nouns=[], plural=false) -%}
+{%- for id in ns.uses if access.id in offers_by_id[id].requires_offers -%}
+{%- set d.nouns = d.nouns + [noun(offers_by_id[id])] -%}
+{%- set d.plural = d.plural or offers_by_id[id].purpose == 'EnergyForecasting' or d.nouns | length > 1 -%}
+{%- endfor -%}
+{{ text.cap(text.join(d.nouns, 'it')) }} {{ 'dipendono' if d.plural else 'dipende' }} da questa scelta
+{%- endmacro %}
+{#- What each choice is for, by purpose. -#}
+{% macro what_for(offer) %}
+{%- set r = party_by_alias[offer.recipients.recipient] -%}
+{%- if offer.purpose == 'MeterDataRelease' and r.kind == 'rec' -%}
+{{ dso.short }} rilascia le tue misure a {{ r.short }}. {{ dependents(offer) }}
+{%- elif offer.purpose == 'MeterDataRelease' -%}
+{{ dso.short }} rende disponibili le tue misure a {{ r.short }}. {{ dependents(offer) }}
+{%- elif offer.purpose == 'FlexibilityResearch' -%}
+La sperimentazione sulla flessibilità della comunità nel progetto di ricerca europeo {{ project.name }}: stimare in quali momenti i consumi potrebbero essere spostati e valutare la fattibilità e la partecipazione dei soci. Non comporta alcun contratto né alcun impegno da parte tua
+{%- elif offer.purpose == 'IncentiveEstimation' -%}
+Una stima informativa del tuo incentivo sull'energia condivisa, fatta prima del calcolo ufficiale del GSE e confrontata con esso quando {{ r.short }} lo riceve. Non cambia quanto ti viene riconosciuto
+{%- elif offer.purpose == 'EnergyForecasting' -%}
+La ricerca di {{ r.short }} e l'addestramento di modelli di previsione dell'energia, compresi modelli di base («foundation model»)
+{%- else -%}{{ no_wording_for_purpose[offer.purpose] }}
+{%- endif -%}
+{% endmacro %}
+---
+document: {{ doc.template }}
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+consent_texts: "{{ consent_texts.texts.values() | map(attribute='version') | unique | join(', ') }}"
+offers: [{{ choices | join(', ') }}]
+---
+
+# Informativa privacy — condivisione dei tuoi dati di misura
+
+**Informativa ai sensi degli artt. 13 e 14 del Regolamento (UE) 2016/679 (GDPR) — versione {{ doc.version }}**
+
+{% call text.wrap() %}
+Questa informativa spiega che cosa succede alle misure del tuo contatore se scegli di
+condividerle tramite l'app della comunità {{ rec.short }}. Si aggiunge all'informativa
+generale di {{ rec.short }} per i soci, che resta valida per il tuo rapporto sociale.
+{% endcall %}
+
+## 1. Chi tratta i tuoi dati
+
+Ciascuno dei seguenti soggetti decide autonomamente perché e come usa i tuoi dati ed è
+titolare autonomo del trattamento per la propria parte:
+
+{% call text.wrap('- ') %}**{{ rec.name }}** — la tua comunità energetica.{% endcall %}
+{% call text.wrap('  - ') %}Sede: {{ rec.registered_office }}.{% endcall %}
+{% if rec.vat == rec.tax_code %}
+{% call text.wrap('  - ') %}C.F. e P.IVA: {{ rec.tax_code }}.{% endcall %}
+{% else %}
+{% call text.wrap('  - ') %}C.F.: {{ rec.tax_code }}.{% endcall %}
+{% call text.wrap('  - ') %}P.IVA: {{ rec.vat }}.{% endcall %}
+{% endif %}
+{% call text.wrap('  - ') %}PEC: {{ rec.pec }}.{% endcall %}
+{% call text.wrap('  - ') %}Contatto privacy: {{ rec.privacy_contact }}.{% endcall %}
+{% call text.wrap('- ') %}**{{ dso.name }}** — gestisce il tuo contatore.{% endcall %}
+{% call text.wrap('  - ') %}Sede: {{ dso.registered_office }}.{% endcall %}
+{% call text.wrap('  - ') %}Contatto privacy: {{ dso.privacy_contact }}.{% endcall %}
+{% call text.wrap('- ') %}**{{ platform.name }}** — gestisce la piattaforma digitale della comunità.{% endcall %}
+{% call text.wrap('  - ') %}Sede: {{ platform.registered_office }}.{% endcall %}
+{% call text.wrap('  - ') %}Contatto privacy: {{ platform.privacy_contact }}.{% endcall %}
+
+{% call text.wrap() %}
+Responsabili della protezione dei dati: {{ rec.short }} {{ rec.dpo }}; {{ dso.short }} {{ dso.dpo }}; {{ platform.short }} {{ platform.dpo }}.
+{% endcall %}
+
+## 2. Quali dati
+
+- Il **codice del punto di prelievo (POD)** riferito alla tua adesione.
+{% call text.wrap('- ') %}
+Le **misure** di quel POD: l'energia prelevata e immessa in rete, a intervalli di {{ durations.span(first.resolution, 'it') }},
+per i **{{ durations.before(first.coverage.retrospective, 'it') }} e {{ durations.after(first.coverage.prospective, 'it') }}** al tuo consenso.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ dso.short }} detiene queste misure come gestore del tuo contatore. {{ text.join(receivers, 'it') }}
+le ricevono da {{ dso.short }}, non da te (art. 14 GDPR).
+{% endcall %}
+
+Con le misure non vengono comunicati il tuo nome, i tuoi recapiti né il tuo codice
+fiscale.
+
+## 3. Perché, e su quale base
+
+Ogni uso qui sotto si basa sul **tuo consenso** (art. 6, par. 1, lett. a GDPR). Ogni uso
+è una scelta distinta. Ogni scelta è **facoltativa** e **non è una condizione per essere
+socio**.
+
+| Scelta | Chi riceve le tue misure | Per cosa |
+|---|---|---|
+{% for id in choices %}
+| {{ consent_texts.texts[id][doc.lang].title }} | {{ recipient(id) }} | {{ what_for(offers_by_id[id]) }} |
+{% endfor %}
+
+{% call text.wrap() %}
+Per il rilascio, {{ rec.short }} comunica a {{ dso.short }} il tuo codice POD insieme alla
+tua decisione.
+{% endcall %}
+
+{% call text.wrap() %}
+Il progetto {{ project.name }} è finanziato dall'Unione europea nell'ambito del programma {{ project.programme }},
+accordo di sovvenzione n. {{ project.grant_agreement }}.
+{% endcall %}
+
+## 4. Chi altro vede i tuoi dati, e dove
+
+Nessuno al di fuori dei tre soggetti indicati e dei fornitori che gestiscono la
+piattaforma per loro conto.
+
+{% call text.wrap('- ') %}**{{ platform.short }}** agisce come responsabile del trattamento in due ruoli:{% endcall %}
+{% call text.wrap('  - ') %}
+gestisce la piattaforma su cui i tuoi dati sono conservati, per conto di {{ rec.short }};
+{% endcall %}
+{% call text.wrap('  - ') %}
+gestisce il connettore dataspace di {{ dso.short }}, per conto di {{ dso.short }}.
+{% endcall %}
+- **Dove funziona la piattaforma:**
+{% call text.wrap('  - ', 84) %}
+su {{ providers.hosting.brand }}, in data center situati nell'Unione europea. {{ providers.hosting.name }}
+è sub-responsabile di {{ platform.short }};
+{% endcall %}
+{% call text.wrap('  - ') %}
+sull'infrastruttura propria di {{ platform.short }} a {{ platform.city }}.
+{% endcall %}
+- **Nessun trasferimento all'estero:** i tuoi dati restano nello Spazio economico
+  europeo e non sono trasferiti al di fuori di esso.
+
+L'elenco completo dei fornitori è nell'elenco dei sub-responsabili della piattaforma.
+
+## 5. Per quanto tempo
+
+{% call text.wrap('', 89) %}
+Ogni destinatario conserva le tue misure **fino a {{ durations.span(first.retention, 'it') }}** dalla ricezione, come indicato
+in ogni scelta.
+{% endcall %}
+
+## 6. Revocare il consenso
+
+Puoi revocare ogni consenso **in ogni momento** dall'app della comunità, alla pagina
+«Condivisione dei dati». Revocare è semplice quanto dare il consenso. La revoca non
+incide su quanto fatto prima.
+
+Dopo la revoca:
+
+- le tue misure non vengono più rilasciate, da quel momento;
+- entro 7 giorni sono escluse da ogni esportazione e da ogni nuova elaborazione;
+- **un modello di previsione già addestrato con i tuoi dati non viene riaddestrato.**
+
+## 7. I tuoi diritti
+
+Puoi chiedere a ciascun soggetto:
+
+- l'accesso ai tuoi dati;
+- la rettifica o la cancellazione;
+- la limitazione del trattamento;
+- la portabilità.
+
+Puoi anche opporti nei casi previsti dalla legge (artt. 15–22 GDPR).
+
+Per esercitare questi diritti:
+
+- scrivi al contatto privacy del soggetto interessato, indicato al punto 1;
+{% call text.wrap('- ') %}oppure scrivi a {{ rec.short }}, che inoltra la richiesta agli altri.{% endcall %}
+
+Riceverai risposta entro un mese.
+
+Puoi anche proporre reclamo al Garante per la protezione dei dati personali, Piazza
+Venezia 11, 00187 Roma, www.garanteprivacy.it.
+
+## 8. Decisioni automatizzate
+
+Nessuna decisione che produca effetti giuridici su di te, o che incida in modo analogo
+su di te, viene presa in modo automatizzato sulla base delle tue misure.
+
+## 9. Modifiche a questa informativa
+
+{% call text.wrap() %}
+Se questa informativa cambia in modo da incidere sulle tue scelte, {{ rec.short }} te lo
+comunica nell'app della comunità prima che la modifica si applichi. Una modifica a ciò
+cui hai acconsentito ti viene chiesta di nuovo, non è mai data per scontata.
+{% endcall %}

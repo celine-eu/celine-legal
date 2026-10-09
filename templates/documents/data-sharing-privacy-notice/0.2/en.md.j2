@@ -1,0 +1,205 @@
+{% import 'macros/text.j2' as text %}
+{% import 'macros/durations.j2' as durations %}
+{#- The choices are the community's consent texts: the accesses (offers that require no
+    other) first, then the uses, each in the consent texts' order. -#}
+{% set ns = namespace(access=[], uses=[]) %}
+{% for id in consent_texts.texts %}
+{% if offers_by_id[id].get('requires_offers') %}{% set ns.uses = ns.uses + [id] %}{% else %}{% set ns.access = ns.access + [id] %}{% endif %}
+{% endfor %}
+{% set choices = ns.access + ns.uses %}
+{% set receivers = [] %}
+{% for id in ns.access %}
+{% set _ = receivers.append(party_by_alias[offers_by_id[id].recipients.recipient].short) %}
+{% endfor %}
+{% set first = offers_by_id[choices[0]] %}
+{% macro recipient(id) %}{{ party_by_alias[offers_by_id[id].recipients.recipient].short }}{% endmacro %}
+{#- How the table names a use that depends on an access, by purpose. -#}
+{% macro noun(offer) %}
+{%- set r = party_by_alias[offer.recipients.recipient] -%}
+{%- if offer.purpose == 'FlexibilityResearch' -%}the flexibility pilot
+{%- elif offer.purpose == 'IncentiveEstimation' -%}the incentive estimate
+{%- elif offer.purpose == 'EnergyForecasting' -%}{{ text.poss(r.short) }} research and forecasting models
+{%- else -%}{{ no_wording_for_purpose[offer.purpose] }}
+{%- endif -%}
+{% endmacro %}
+{% macro dependents(access) %}
+{%- set d = namespace(nouns=[], plural=false) -%}
+{%- for id in ns.uses if access.id in offers_by_id[id].requires_offers -%}
+{%- set d.nouns = d.nouns + [noun(offers_by_id[id])] -%}
+{%- set d.plural = d.plural or offers_by_id[id].purpose == 'EnergyForecasting' or d.nouns | length > 1 -%}
+{%- endfor -%}
+{{ text.cap(text.join(d.nouns, 'en')) }} {{ 'depend' if d.plural else 'depends' }} on it
+{%- endmacro %}
+{#- What each choice is for, by purpose. -#}
+{% macro what_for(offer) %}
+{%- set r = party_by_alias[offer.recipients.recipient] -%}
+{%- if offer.purpose == 'MeterDataRelease' and r.kind == 'rec' -%}
+{{ dso.short }} releases your readings to {{ r.short }}. {{ dependents(offer) }}
+{%- elif offer.purpose == 'MeterDataRelease' -%}
+{{ dso.short }} makes your readings available to {{ r.short }}. {{ dependents(offer) }}
+{%- elif offer.purpose == 'FlexibilityResearch' -%}
+The community's flexibility pilot in the European research project {{ project.name }}: estimating when consumption could be shifted, and assessing feasibility and members' participation. It involves no contract and no commitment on your part
+{%- elif offer.purpose == 'IncentiveEstimation' -%}
+An estimate, for information only, of your shared-energy incentive ahead of GSE's official calculation, compared with that calculation once {{ r.short }} receives it. It does not change what you are paid
+{%- elif offer.purpose == 'EnergyForecasting' -%}
+{{ text.poss(r.short) }} own research and the training of energy forecasting models, including foundation models
+{%- else -%}{{ no_wording_for_purpose[offer.purpose] }}
+{%- endif -%}
+{% endmacro %}
+---
+document: {{ doc.template }}
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+consent_texts: "{{ consent_texts.texts.values() | map(attribute='version') | unique | join(', ') }}"
+offers: [{{ choices | join(', ') }}]
+---
+
+# Privacy notice — sharing your meter readings
+
+**Information under Articles 13 and 14 of Regulation (EU) 2016/679 (GDPR) — version {{ doc.version }}**
+
+{% call text.wrap() %}
+This notice explains what happens to the readings of your electricity meter if you
+choose to share them through the {{ rec.short }} community app. It adds to {{ text.poss(rec.short) }}
+general privacy notice for members, which continues to apply to your membership.
+{% endcall %}
+
+## 1. Who processes your data
+
+Each of the following organisations decides for itself why and how it uses your data,
+and is an independent controller for its own part:
+
+- **{{ rec.name }}** — your energy community.
+{% call text.wrap('  - ') %}Address: {{ rec.registered_office }}, {{ rec.country[doc.lang] }}.{% endcall %}
+{% if rec.vat == rec.tax_code %}
+{% call text.wrap('  - ') %}Tax code and VAT: {{ rec.tax_code }}.{% endcall %}
+{% else %}
+{% call text.wrap('  - ') %}Tax code: {{ rec.tax_code }}.{% endcall %}
+{% call text.wrap('  - ') %}VAT: {{ rec.vat }}.{% endcall %}
+{% endif %}
+{% call text.wrap('  - ') %}PEC: {{ rec.pec }}.{% endcall %}
+{% call text.wrap('  - ') %}Privacy contact: {{ rec.privacy_contact }}.{% endcall %}
+{% call text.wrap('- ') %}**{{ dso.name }}** — operates your meter.{% endcall %}
+{% call text.wrap('  - ') %}Address: {{ dso.registered_office }}.{% endcall %}
+{% call text.wrap('  - ') %}Privacy contact: {{ dso.privacy_contact }}.{% endcall %}
+{% call text.wrap('- ') %}**{{ platform.name }}** — operates the community's digital platform.{% endcall %}
+{% call text.wrap('  - ') %}Address: {{ platform.registered_office }}.{% endcall %}
+{% call text.wrap('  - ') %}Privacy contact: {{ platform.privacy_contact }}.{% endcall %}
+
+{% call text.wrap() %}
+Data protection officers: {{ rec.short }} {{ rec.dpo }}; {{ dso.short }} {{ dso.dpo }}; {{ platform.short }} {{ platform.dpo }}.
+{% endcall %}
+
+## 2. What data
+
+- The **supply point code (POD)** referring to your membership.
+{% call text.wrap('- ') %}
+The **readings** of that POD: the energy you draw from and feed into the grid, in
+{{ durations.span(first.resolution, 'en', true) }} intervals, for the **{{ durations.before(first.coverage.retrospective, 'en') }} and the {{ durations.after(first.coverage.prospective, 'en') }}** your consent.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ dso.short }} holds these readings as your meter operator. {{ text.join(receivers, 'en') }}
+receive them from {{ dso.short }}, not from you (Article 14 GDPR).
+{% endcall %}
+
+No name, contact detail or tax code of yours is passed on with the readings.
+
+## 3. Why, and on what basis
+
+Every use below rests on **your consent** (Article 6(1)(a) GDPR). Each is a separate
+choice. Each is **optional** and is **not a condition of membership**.
+
+| Choice | Who receives your readings | What for |
+|---|---|---|
+{% for id in choices %}
+| {{ consent_texts.texts[id][doc.lang].title }} | {{ recipient(id) }} | {{ what_for(offers_by_id[id]) }} |
+{% endfor %}
+
+{% call text.wrap() %}
+For the release, {{ rec.short }} gives {{ dso.short }} your POD code, together with your
+decision.
+{% endcall %}
+
+{% call text.wrap() %}
+The {{ project.name }} project is funded by the European Union under the {{ project.programme }} programme,
+grant agreement No. {{ project.grant_agreement }}.
+{% endcall %}
+
+## 4. Who else sees your data, and where
+
+No one outside the three organisations above and the providers that run the platform
+for them.
+
+{% call text.wrap('- ') %}
+**{{ platform.short }}** operates the platform on which your data is kept, on behalf of {{ rec.short }}.
+It also operates {{ text.poss(dso.short) }} dataspace connector, on behalf of {{ dso.short }}.
+In both roles it acts as a processor.
+{% endcall %}
+- **Where the platform runs:**
+{% call text.wrap('  - ', 86) %}
+{{ providers.hosting.brand }}, in data centres in the European Union. {{ providers.hosting.name }} is
+a sub-processor of {{ platform.short }}.
+{% endcall %}
+{% call text.wrap('  - ') %}
+{{ text.poss(platform.short) }} own infrastructure in {{ platform.city }}, {{ platform.country[doc.lang] }}.
+{% endcall %}
+- **No transfers abroad:** your data stays in the European Economic Area and is not
+  transferred outside it.
+
+The full list of providers is in the platform's sub-processor list.
+
+## 5. How long
+
+{% call text.wrap() %}
+Each recipient keeps your readings for **up to {{ durations.span(first.retention, 'en') }}** from receipt, as each choice
+declares.
+{% endcall %}
+
+## 6. Withdrawing your consent
+
+You can withdraw any consent **at any time** in the community app, on the "Data sharing"
+page. Withdrawing is as easy as giving consent. It does not affect what was done before
+you withdrew.
+
+After you withdraw:
+
+- your readings are no longer released, from that moment;
+- within 7 days, they are left out of every export and every new processing;
+- **a forecasting model already trained with your data is not retrained.**
+
+## 7. Your rights
+
+You can ask each organisation for:
+
+- access to your data;
+- rectification or erasure;
+- restriction of processing;
+- portability.
+
+You can also object where the law allows (Articles 15–22 GDPR).
+
+To exercise these rights:
+
+- write to the privacy contact in §1 of the organisation concerned;
+{% call text.wrap('- ') %}or write to {{ rec.short }}, which passes your request on to the others.{% endcall %}
+
+You will receive an answer within one month.
+
+You can also lodge a complaint with the Italian data protection authority: Garante per
+la protezione dei dati personali, Piazza Venezia 11, 00187 Roma, www.garanteprivacy.it.
+
+## 8. Automated decisions
+
+No decision that produces legal effects on you, or similarly affects you, is taken
+automatically on the basis of your readings.
+
+## 9. Changes to this notice
+
+{% call text.wrap() %}
+If this notice changes in a way that affects your choices, {{ rec.short }} tells you in the
+community app before the change applies. A change to what you consented to is asked
+again; it is never assumed.
+{% endcall %}

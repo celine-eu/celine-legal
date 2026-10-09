@@ -1,0 +1,26 @@
+{#- IncentiveEstimation: the recipient uses the readings it receives from the grid
+    operator to estimate the member's shared-energy incentive ahead of the GSE's
+    official calculation (the Italian renewable energy community regime). `noun` and
+    `plural` are how an access offer this one requires names it. -#}
+{% import 'consent-texts/1.0/common.j2' as c with context %}
+{% set plural = false %}
+
+{% macro title(lang, offer, recipient) %}
+{{- "Stima dell'incentivo" if lang == 'it' else 'Incentive estimate' -}}
+{% endmacro %}
+
+{% macro noun(lang) %}
+{{- "la stima dell'incentivo" if lang == 'it' else 'the incentive estimate' -}}
+{% endmacro %}
+
+{% macro body(lang, offer, recipient) %}
+{% if lang == 'it' %}
+Autorizzo {{ c.name(recipient) }} a usare le misure che riceve da {{ dso.short }} ({{ c.readings(lang, offer, 'brief') }}) per stimare l'incentivo sull'energia condivisa che mi riguarda, prima del calcolo ufficiale del GSE, e per confrontare la stima con quel calcolo quando è disponibile.
+È una stima informativa: non sostituisce il calcolo del GSE e non determina quanto mi viene riconosciuto.
+{{ c.optional(lang) }}: {{ c.after_withdrawal(lang, 'use') }}.
+{% else %}
+I allow {{ c.name(recipient) }} to use the readings it receives from {{ dso.short }} ({{ c.readings(lang, offer, 'brief') }}) to estimate the shared-energy incentive that concerns me ahead of GSE's official calculation, and to compare the estimate with that calculation once it is available.
+It is an estimate for information only: it does not replace GSE's calculation and does not decide what I am paid.
+{{ c.optional(lang) }}: {{ c.after_withdrawal(lang, 'use') }}.
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,283 @@
+{% import 'macros/text.j2' as text %}
+{% import 'macros/durations.j2' as durations %}
+{#- The choices are the community's consent texts: the accesses (offers that require no
+    other) first, then the uses, each in the consent texts' order. -#}
+{% set ns = namespace(access=[], uses=[]) %}
+{% for id in consent_texts.texts %}
+{% if offers_by_id[id].get('requires_offers') %}{% set ns.uses = ns.uses + [id] %}{% else %}{% set ns.access = ns.access + [id] %}{% endif %}
+{% endfor %}
+{% set choices = ns.access + ns.uses %}
+{% set receivers = [] %}
+{% for id in ns.access %}
+{% set _ = receivers.append(party_by_alias[offers_by_id[id].recipients.recipient].short) %}
+{% endfor %}
+{% set platform_choices = [] %}
+{% for id in choices if party_by_alias[offers_by_id[id].recipients.recipient] is sameas platform %}
+{% set _ = platform_choices.append('`' ~ id ~ '`') %}
+{% endfor %}
+{% set first = offers_by_id[choices[0]] %}
+{% macro recipient(id) %}{{ party_by_alias[offers_by_id[id].recipients.recipient].short }}{% endmacro %}
+{#- The choices that require an access, in the offers' order, by id. -#}
+{% macro dependents(access) %}
+{%- set d = namespace(ids=[]) -%}
+{%- for offer in offers if offer.id in choices and access.id in (offer.get('requires_offers') or []) -%}
+{%- set d.ids = d.ids + ['`' ~ offer.id ~ '`'] -%}
+{%- endfor -%}
+{{ text.join(d.ids, 'en') }} {{ 'depend' if d.ids | length > 1 else 'depends' }} on it
+{%- endmacro %}
+{#- What each choice is for, by purpose. -#}
+{% macro purpose(offer) %}
+{%- set r = party_by_alias[offer.recipients.recipient] -%}
+{%- if offer.purpose == 'MeterDataRelease' and r.kind == 'rec' -%}
+{{ dso.short }} releases the member's readings to {{ r.short }}. {{ dependents(offer) }}
+{%- elif offer.purpose == 'MeterDataRelease' -%}
+{{ dso.short }} makes the member's readings available to {{ r.short }}. {{ dependents(offer) }}
+{%- elif offer.purpose == 'FlexibilityResearch' -%}
+The community's flexibility pilot in the {{ project.name }} project: estimating when consumption could be shifted, and assessing feasibility and members' participation
+{%- elif offer.purpose == 'IncentiveEstimation' -%}
+An estimate, for information only, of the member's shared-energy incentive ahead of GSE's official calculation, compared with that calculation once {{ r.short }} receives it
+{%- elif offer.purpose == 'EnergyForecasting' -%}
+{{ text.poss(r.short) }} own research and the training of energy forecasting models, including foundation models. The readings reach {{ r.short }} from {{ dso.short }} directly or through {{ rec.short }}
+{%- else -%}{{ no_wording_for_purpose[offer.purpose] }}
+{%- endif -%}
+{% endmacro %}
+---
+document: {{ doc.template }}
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+consent_texts: "{{ consent_texts.texts.values() | map(attribute='version') | unique | join(', ') }}"
+offers: [{{ choices | join(', ') }}]
+---
+
+# Member meter data sharing agreement
+
+**Between {{ text.join([rec.short, dso.short, platform.short], 'en') }} — version {{ doc.version }}**
+
+## 1. Parties
+
+| Party | Details | Role under this agreement |
+|---|---|---|
+| **{{ rec.name }}** ("{{ rec.short }}") | {{ rec.registered_office }}, {{ rec.country[doc.lang] }}; {% if rec.vat == rec.tax_code %}tax code and VAT {{ rec.tax_code }}{% else %}tax code {{ rec.tax_code }}; VAT {{ rec.vat }}{% endif %}; PEC {{ rec.pec }}; represented by {{ rec.representative }} | Independent controller for the purposes it pursues (§4). It is the renewable energy community and collects its members' decisions |
+| **{{ dso.name }}** ("{{ dso.short }}") | {{ dso.registered_office }}; tax code {{ dso.tax_code }}; PEC {{ dso.pec }}; represented by {{ dso.representative }} | Independent controller of the release. It operates the members' meters and holds their readings |
+| **{{ platform.name }}** ("{{ platform.short }}") | {{ platform.registered_office }}; tax code {{ platform.tax_code }}; PEC {{ platform.pec }}; represented by {{ platform.representative }} | Independent controller for its own research and model training (§4). Processor of {{ rec.short }} for operating the community's digital platform, and processor of {{ dso.short }} for operating its dataspace connector (§7) |
+
+{% call text.wrap() %}
+The parties are partners in the {{ project.name }} project, funded by the European Union under the
+{{ project.programme }} programme, grant agreement No. {{ project.grant_agreement }}. Each party's participation in
+the dataspace is governed by the dataspace participation agreement it has accepted. This
+agreement adds the terms of the member meter data flow.
+{% endcall %}
+
+## 2. Purpose
+
+{% call text.wrap() %}
+This agreement lets the members of {{ text.poss(rec.short) }} renewable energy community decide
+whether {{ dso.short }} releases the readings of their supply point, and whether
+{{ text.join(receivers, 'en') }} use them for the purposes listed in §4. It governs each step of
+that flow.
+{% endcall %}
+
+The agreement does not cover settlement with GSE, any ARERA procedure, or flexibility
+contracting.
+
+## 3. The data
+
+{% call text.wrap('- ') %}
+**Supply point code (POD)** referring to the membership of each member who has
+consented. {{ rec.short }} validates it when activating the member. If it was declared
+wrongly, {{ rec.short }} corrects it and records the correction as a revision.
+{% endcall %}
+{% call text.wrap('- ') %}
+**Meter readings** of that POD: energy drawn from and fed into the grid, in {{ durations.span(first.resolution, 'en', true) }}
+intervals, for the **{{ durations.before(first.coverage.retrospective, 'en') }} and the {{ durations.after(first.coverage.prospective, 'en') }}** the member's consent. They
+are supplied in {{ text.poss(dso.short) }} {{ dso.meter_export_format }} export format, without contract details.
+{% endcall %}
+
+No member's name, contact details or tax code is disclosed under this agreement.
+
+## 4. Consent and purposes
+
+Each purpose rests on the member's consent. The consent is:
+
+- asked separately for each recipient and purpose;
+- never a condition of membership;
+- open to withdrawal at any time.
+
+Before deciding, the member reads version {{ consent_texts.texts.values() | map(attribute='version') | unique | join(', ') }} of the text of each choice.
+
+| Choice | Recipient | Purpose |
+|---|---|---|
+{% for id in choices %}
+| `{{ id }}` | {{ recipient(id) }} | {{ purpose(offers_by_id[id]) }} |
+{% endfor %}
+
+{% call text.wrap() %}
+Each recipient keeps member-level readings for **up to {{ durations.span(first.retention, 'en') }}** from receipt, as each
+choice declares.
+{% endcall %}
+
+{% for id in choices if offers_by_id[id].purpose == 'IncentiveEstimation' %}
+{% call text.wrap() %}
+GSE's calculation, used for the comparison in `{{ id }}`, is data {{ rec.short }}
+receives from GSE as the referent of its configuration. It is not disclosed under this
+agreement.
+{% endcall %}
+{% endfor %}
+
+## 5. How the data moves
+
+1. **Decision.**
+{% call text.wrap('   - ') %}
+{{ rec.short }} asks the member: in its onboarding form for new members, and in the
+community app for existing members.
+{% endcall %}
+{% call text.wrap('   - ') %}
+It records each decision and each withdrawal at {{ text.poss(dso.short) }} dataspace
+connector, acting as the collector, and passes the member's POD with the decision.
+{% endcall %}
+{% call text.wrap('2. ') %}
+**Release.** {{ dso.short }} serves readings through its own connector. It serves
+only the PODs whose release consent is current, and only within the period in §3.
+{% endcall %}
+{% call text.wrap('3. ') %}
+**Use.** {{ text.join(receivers, 'en') }} each obtain the readings through their own
+connector, under the choice that names them. They use the readings only for that
+choice's purpose.
+{% endcall %}
+
+{% call text.wrap() %}
+**{{ dso.short }} can read the consent record at its own connector.**
+{% endcall %}
+
+- **What it sees:** for each choice it releases under, which PODs have a current release
+  consent and since when, and the history of every authorisation and withdrawal.
+- **What it does not see:** only the POD is shown, not the member's name, identity or
+  any other consent of theirs.
+{% call text.wrap('- ') %}
+**What it is for:** the record is what its connector enforces. {{ dso.short }} can
+therefore check and demonstrate that it releases only what step 2 allows.
+{% endcall %}
+
+{% call text.wrap() %}
+No member-level list is sent to {{ dso.short }}, and no member-level readings are
+released under this agreement, until the connector channel in step 1 is in operation.
+How the data travels is governed by this agreement, not by the consent text, so changing
+the channel does not invalidate any consent.
+{% endcall %}
+
+Every step is recorded in the dataspace's provenance record:
+
+- each consent given and each withdrawal;
+- each disclosure;
+- each ingestion.
+
+## 6. Where the data is processed
+
+{% call text.wrap() %}
+The platform runs on {{ providers.hosting.brand }} infrastructure in the European Union, and on
+{{ text.poss(platform.short) }} own infrastructure in {{ platform.city }}, {{ platform.country[doc.lang] }}. The member-level data covered by this
+agreement is processed only in the European Economic Area and is not transferred outside
+it.
+{% endcall %}
+
+## 7. {{ platform.short }} as processor
+
+{% call text.wrap() %}
+{{ platform.short }} operates two services as a processor:
+{% endcall %}
+
+{% call text.wrap('- ', 86) %}
+the community's digital platform (onboarding, community app, dataspace connector),
+on {{ text.poss(rec.short) }} documented instructions;
+{% endcall %}
+{% call text.wrap('- ') %}
+{{ text.poss(dso.short) }} dataspace connector and its consent record, on {{ text.poss(dso.short) }}
+documented instructions.
+{% endcall %}
+
+Each service is governed by a separate data processing agreement under Article 28 GDPR.
+
+{% call text.wrap() %}
+{{ platform.short }} keeps its own research and model training, for which it is a controller,
+separate from both services. It uses for that research only the readings it receives
+under {{ text.join(platform_choices, 'en') }}.
+{% endcall %}
+
+## 8. Obligations of every party
+
+- **Purpose and consent:** process the data only for the purpose of the choice that
+  names the party, and only while the member's consent is current.
+- **Withdrawal:**
+  - Releases stop at once. The connector refuses the member's readings from the moment
+    the withdrawal is recorded.
+  - Within **7 days**, the member is left out of every export and every new processing.
+  - Readings already received are kept no longer than the retention in §4. They are
+    erased earlier if the member asks, within one month of the request (Articles 12(3)
+    and 17 GDPR).
+  - **Models already trained** with the member's readings are **not retrained**. The
+    member is told so before consenting.
+- **Retention:** keep no member-level data beyond the retention in §4.
+- **No onward disclosure:** disclose member-level data to no one other than the three
+  parties and their processors.
+- **Security:** apply technical and organisational measures appropriate to energy
+  consumption data, which can reveal household behaviour.
+- **Assistance:** assist the other parties with data-subject requests and with
+  personal-data breaches. Notify the others of a breach affecting data under this
+  agreement within 48 hours of becoming aware of it.
+
+## 9. Obligations of each party
+
+- **{{ rec.short }}:**
+  - validate each member in person before activation;
+  - ask for consent without conditioning membership on it;
+  - record decisions and withdrawals faithfully and pass them on without delay;
+  - provide the members' information notice.
+- **{{ dso.short }}:**
+  - release readings only for consenting members' PODs and only within the period in §3;
+  - stop releasing a POD once its consent is withdrawn;
+  - use the consent record at its connector (§5) only to perform and demonstrate the
+    release.
+- **{{ platform.short }}:**
+  - operate the services in §7 only on the documented instructions of the party
+    concerned;
+  - keep its own research and model training separate from that operation;
+  - exclude a withdrawn member's readings from every new training run.
+
+## 10. Term and changes
+
+{% call text.wrap() %}
+This agreement runs for the duration of the {{ project.name }} pilot and ends with it. When it ends,
+each party stops receiving readings under this agreement. It keeps those already
+received no longer than the retention in §4.
+{% endcall %}
+
+Changes work as follows:
+
+- **A change to a consent text** is a new version of that choice. The member must decide
+  again.
+- **A change to this agreement** is a new version, signed by all three parties.
+
+## 11. Data management plan
+
+The project's data management plan refers to this agreement for the member meter data
+flow.
+
+## 12. Liability, law and disputes
+
+- Each party is liable for its own processing, as provided by Article 82 GDPR.
+- This agreement is governed by Italian law.
+{% call text.wrap('- ') %}
+The courts of {{ rec.forum[doc.lang] }} have exclusive jurisdiction over any dispute arising from it.
+{% endcall %}
+
+## Signatures
+
+{# Signature cells are filled in by hand at signing: a draft shows the blank, a final edition an empty cell. #}
+{% set to_sign = '' if doc.status == 'final' else '[•]' %}
+| Party | Name and role | Date | Signature |
+|---|---|---|---|
+| {{ rec.short }} | {{ to_sign }} | {{ to_sign }} | |
+| {{ dso.short }} | {{ to_sign }} | {{ to_sign }} | |
+| {{ platform.short }} | {{ to_sign }} | {{ to_sign }} | |

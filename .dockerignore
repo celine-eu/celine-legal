@@ -1,0 +1,9 @@
+# The image holds the project, its templates and the example deployment; nothing else.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!src/
+!templates/
+!data/example/
+**/__pycache__

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "identity.schema.json",
+  "title": "The identity of an organisation a document names",
+  "description": "An energy community's identity is a snapshot of the rec-registry (community.legal, community.contact). Every other party's lives in the deployment's parties file. \"[•]\" is a value nobody has supplied yet.",
+  "type": "object",
+  "required": [
+    "name",
+    "short",
+    "kind"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "the registry community key (energy communities only)"
+    },
+    "name": {
+      "type": "string",
+      "description": "the full legal name"
+    },
+    "short": {
+      "type": "string",
+      "description": "the name the texts use after the first mention"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "the name the organisation presents to members (e.g. in an app and in consent texts), when it is neither the legal name nor the short name"
+    },
+    "meter_export_format": {
+      "type": "string",
+      "description": "the name of the format in which a grid operator exports meter readings"
+    },
+    "kind": {
+      "enum": [
+        "rec",
+        "dso",
+        "platform-operator",
+        "dataspace"
+      ]
+    },
+    "legal_form": {
+      "type": "string"
+    },
+    "registered_office": {
+      "type": "string",
+      "description": "street, postcode, city (province), without the country"
+    },
+    "operating_site": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string",
+      "description": "the city of the operating site"
+    },
+    "country": {
+      "$ref": "#/$defs/localised"
+    },
+    "forum": {
+      "$ref": "#/$defs/localised",
+      "description": "the city whose courts have exclusive jurisdiction over disputes under the party's agreements (a dataspace)"
+    },
+    "tax_code": {
+      "type": "string"
+    },
+    "vat": {
+      "type": "string"
+    },
+    "rea": {
+      "type": "string"
+    },
+    "pec": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "privacy_contact": {
+      "type": "string"
+    },
+    "dpo": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "representative": {
+      "type": "string"
+    },
+    "source": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "other names the party goes by, e.g. its dataspace participant alias in offer recipients"
+    }
+  },
+  "$defs": {
+    "localised": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]{2}$": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

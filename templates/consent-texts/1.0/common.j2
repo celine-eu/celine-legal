@@ -1,0 +1,51 @@
+{#- Phrases every consent text shares. A purpose template imports this with context.
+    `recipient` is the offer's recipient (party_by_alias[offer.recipients.recipient]);
+    the holder of the readings is the community's grid operator, `dso`. -#}
+{% import 'macros/durations.j2' as durations %}
+
+{#- How a member knows the recipient: its display name if it has one, else its short name. -#}
+{% macro name(party) %}{{ party.get('display_name') or party.short }}{% endmacro %}
+
+{#- What the recipient does for the community, when that is why the member knows it.
+    Empty for a recipient with no such role. -#}
+{% macro role(lang, party) %}
+{%- if party.kind == 'platform-operator' -%}
+{{ 'gestisce la piattaforma digitale della comunità' if lang == 'it' else "operates the community's digital platform" }}
+{%- endif -%}
+{% endmacro %}
+
+{#- The readings an offer covers, from its resolution and coverage. `form` 'full' is the
+    access offers' wording, 'brief' the wording of the uses, in brackets. -#}
+{% macro readings(lang, offer, form) %}
+{%- set step = offer.resolution -%}
+{%- set back = offer.coverage.retrospective -%}
+{%- set ahead = offer.coverage.prospective -%}
+{%- if lang == 'it' and form == 'full' -%}
+l'energia prelevata e quella immessa in rete, a intervalli di {{ durations.span(step, 'it') }}, per i {{ durations.before(back, 'it') }} e per {{ durations.after(ahead, 'it') }} a questo consenso
+{%- elif lang == 'it' -%}
+energia prelevata e immessa, a intervalli di {{ durations.span(step, 'it') }}, per i {{ durations.before(back, 'it') }} e {{ durations.after(ahead, 'it') }} a questo consenso
+{%- elif form == 'full' -%}
+the energy I draw from and feed into the grid, in {{ durations.span(step, 'en', true) }} intervals, for the {{ durations.before(back, 'en') }} and the {{ durations.after(ahead, 'en') }} this consent
+{%- else -%}
+energy drawn and fed in, in {{ durations.span(step, 'en', true) }} intervals, for the {{ durations.before(back, 'en') }} and the {{ durations.after(ahead, 'en') }} this consent
+{%- endif -%}
+{% endmacro %}
+
+{#- That the consent is free and where it is withdrawn; the purpose adds what withdrawal
+    does, after a colon, or ends the sentence. -#}
+{% macro optional(lang) %}
+{%- if lang == 'it' -%}
+Il consenso è facoltativo e non è una condizione per essere socio. Posso revocarlo in ogni momento dall'app della comunità, alla pagina «Condivisione dei dati»
+{%- else -%}
+This consent is optional and is not a condition of membership. I can withdraw it at any time in the community app, on the "Data sharing" page
+{%- endif -%}
+{% endmacro %}
+
+{#- What withdrawal does to an access (no later release) or to a use (no new processing). -#}
+{% macro after_withdrawal(lang, kind) %}
+{%- if kind == 'release' -%}
+{{ 'dopo la revoca i miei dati non sono più compresi nei rilasci successivi' if lang == 'it' else 'after that, my data is left out of every later release' }}
+{%- else -%}
+{{ 'dopo la revoca i miei dati non sono più usati in nuove elaborazioni' if lang == 'it' else 'after that, my data is not used in any new processing' }}
+{%- endif -%}
+{% endmacro %}

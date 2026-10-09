@@ -1,0 +1,159 @@
+---
+document: terms-of-use
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Condizioni d'uso della piattaforma digitale {{ rec.short }}
+
+**Versione {{ doc.version }}**
+
+## 1. Chi offre il servizio
+
+{% filter wordwrap(88) %}
+La piattaforma digitale della comunità energetica (domanda di adesione online, app della comunità{{ ', assistente AI' if features.ai_assistant else '' }} e notifiche) è offerta da **{{ rec.name }}**:
+{%- endfilter +%}
+
+- sede: {{ rec.registered_office }};
+- C.F. e P.IVA: {{ rec.tax_code }};
+- email: {{ rec.email }};
+- PEC: {{ rec.pec }}.
+
+La piattaforma è gestita per conto di {{ rec.short }} da **{{ platform.name }}**.
+
+La piattaforma è sviluppata nel progetto di ricerca {{ project.name }}, finanziato dall'Unione europea
+nell'ambito del programma {{ project.programme }} (accordo di sovvenzione n. {{ project.grant_agreement }}).
+
+## 2. Che cosa sono queste condizioni
+
+Queste condizioni regolano l'uso della piattaforma. Non sostituiscono né modificano:
+
+- lo statuto di {{ rec.short }};
+- il regolamento della comunità energetica;
+- le delibere degli organi sociali.
+
+Questi continuano a regolare il tuo rapporto con la cooperativa e, in caso di contrasto,
+prevalgono.
+
+Il trattamento dei tuoi dati è descritto nell'informativa privacy della piattaforma.
+
+## 3. Chi può usare la piattaforma
+
+- **La domanda di adesione** è aperta a chi vuole diventare socio di {{ rec.short }}.
+- **L'app della comunità** è riservata ai soci ammessi. L'accesso è personale: non
+  condividere le tue credenziali e avvisa {{ rec.short }} se pensi che qualcuno le abbia
+  usate.
+- Se usi la piattaforma per conto di un'impresa o di un ente, dichiari di avere il potere
+  di farlo.
+
+## 4. Che cosa offre
+
+L'app ti permette di:
+
+- vedere i consumi e la produzione dei contatori e dispositivi registrati a tuo nome;
+- vedere previsioni, stime e suggerimenti per spostare i consumi;
+- prendere impegni sui suggerimenti e raccogliere punti e badge;
+- ricevere notifiche;
+{% if features.ai_assistant %}
+- usare l'assistente AI;
+{% endif %}
+{% if features.dso_data_exchange %}
+- decidere sulla condivisione dei tuoi dati di misura;
+{% endif %}
+- inviare segnalazioni.
+
+Le funzioni possono cambiare durante il progetto. {{ rec.short }} ti avvisa nell'app dei
+cambiamenti rilevanti.
+
+## 5. Previsioni, stime e suggerimenti
+
+- Previsioni, stime e suggerimenti sono **informativi**.
+- La **stima dell'incentivo** non sostituisce il calcolo ufficiale del GSE. Quanto ti
+  spetta è determinato secondo lo statuto e il regolamento della comunità.
+- I **suggerimenti** sono facoltativi. Seguirli o no non comporta conseguenze sul tuo
+  rapporto con la cooperativa.
+- I **punti e i badge** servono a partecipare alla vita della comunità. Non hanno valore
+  economico, salvo che il regolamento o una delibera dispongano diversamente.
+
+{% set skip = 0 if features.ai_assistant else 1 %}
+{% if features.ai_assistant %}
+## 6. L'assistente AI
+
+- L'assistente è un **sistema di intelligenza artificiale**.
+- Risponde usando i tuoi dati nella piattaforma e con i tuoi stessi permessi.
+- Le risposte **possono essere sbagliate o incomplete**. Non sono consulenza tecnica,
+  legale, fiscale o finanziaria. Verifica le informazioni importanti con {{ rec.short }}.
+- **Non allegare** documenti d'identità, dati sanitari o dati personali di altre persone.
+- Puoi cancellare in ogni momento le tue conversazioni e i tuoi allegati.
+
+{% endif %}
+## {{ 7 - skip }}. Uso corretto
+
+Usando la piattaforma ti impegni a:
+
+- fornire informazioni vere e aggiornate;
+- non accedere ai dati di altri soci e non tentare di aggirare le protezioni della
+  piattaforma;
+- non usare la piattaforma{{ ", compreso l'assistente," if features.ai_assistant else '' }} per scopi illeciti, offensivi o
+  estranei alla comunità;
+- non caricare contenuti che violano diritti di terzi;
+- non interferire con il funzionamento della piattaforma, ad esempio con accessi
+  automatizzati non autorizzati.
+
+## {{ 8 - skip }}. Disponibilità
+
+- {% filter wordwrap(86) | indent(2) %}
+La piattaforma è sviluppata e migliorata nell'ambito di un progetto di ricerca. {{ rec.short }} si impegna a mantenerla disponibile e sicura, ma non può garantire che funzioni sempre senza interruzioni o errori.
+{%- endfilter +%}
+- Interventi di manutenzione programmata sono comunicati nell'app quando possibile.
+- I dati mostrati possono arrivare in ritardo o essere incompleti, ad esempio quando il
+  gestore di rete non li ha ancora resi disponibili.
+
+## {{ 9 - skip }}. Sospensione e cessazione
+
+- Puoi smettere di usare l'app in ogni momento.
+- Il tuo account è disattivato quando cessa il rapporto sociale.
+- {{ rec.short }} può sospendere l'accesso se queste condizioni sono violate in modo grave o
+  per proteggere la sicurezza della piattaforma. Ti informa del motivo, salvo che la
+  legge lo impedisca.
+- Alla cessazione i tuoi dati sono trattati come indicato nell'informativa privacy della
+  piattaforma.
+
+## {{ 10 - skip }}. Proprietà intellettuale
+
+- Il software della piattaforma è distribuito dal progetto {{ project.name }} con licenze open
+  source, indicate nei rispettivi repository.
+- {% filter wordwrap(86) | indent(2) %}
+I contenuti che inserisci, come messaggi e segnalazioni, restano tuoi. Concedi a {{ rec.short }} l'uso necessario a fornirti il servizio.
+{%- endfilter +%}
+
+## {{ 11 - skip }}. Responsabilità
+
+- {{ rec.short }} risponde dei danni causati con dolo o colpa grave e di ogni altra
+  responsabilità che la legge non consente di escludere.
+- Nei limiti consentiti dalla legge, {{ rec.short }} non risponde di decisioni prese
+  basandosi soltanto su {{ "previsioni, stime, suggerimenti o risposte dell'assistente" if features.ai_assistant else 'previsioni, stime o suggerimenti' }}.
+- Se sei un consumatore, restano fermi i diritti che ti riconosce il Codice del consumo.
+
+## {{ 12 - skip }}. Modifiche
+
+- {{ rec.short }} può modificare queste condizioni per cambiamenti del servizio, della legge
+  o del progetto.
+- La nuova versione ti è mostrata al primo accesso successivo e si applica da quando la
+  accetti.
+- Se non la accetti, puoi smettere di usare l'app. Il rapporto sociale non ne è toccato.
+
+## {{ 13 - skip }}. Legge applicabile e controversie
+
+- Queste condizioni sono regolate dalla legge italiana.
+- Per le controversie tra {{ rec.short }} e i soci si applica la clausola di conciliazione
+  dello statuto.
+- Se sei un consumatore, è competente il giudice del luogo in cui risiedi.
+
+## {{ 14 - skip }}. Contatti
+
+Per domande su queste condizioni: {{ rec.email }}.
+
+Per la privacy: {{ rec.privacy_contact }}.

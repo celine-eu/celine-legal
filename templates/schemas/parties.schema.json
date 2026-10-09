@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "parties.schema.json",
+  "title": "The parties of a deployment other than its energy communities",
+  "type": "object",
+  "required": [
+    "roles",
+    "parties"
+  ],
+  "properties": {
+    "roles": {
+      "type": "object",
+      "required": [
+        "platform_operator"
+      ],
+      "properties": {
+        "platform_operator": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "parties": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "identity.schema.json"
+      }
+    },
+    "processing": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "controller",
+          "processor",
+          "service"
+        ],
+        "properties": {
+          "controller": {
+            "type": "string"
+          },
+          "processor": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string"
+          },
+          "agreement": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "hosting": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "programme": {
+          "type": "string"
+        },
+        "grant_agreement": {
+          "type": "string"
+        }
+      }
+    },
+    "providers": {
+      "type": "object",
+      "description": "the platform operator's providers, by service",
+      "additionalProperties": {
+        "type": "object"
+      }
+    }
+  }
+}

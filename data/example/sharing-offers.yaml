@@ -1,0 +1,18 @@
+# One consent-based offer per purpose the consent-text templates know, and a release to
+# each kind of recipient (the community, the platform operator).
+_release: &release
+  purpose: MeterDataRelease
+  legal_basis: https://w3id.org/dpv#Consent
+  subject_scope: own_data
+  measures: [consumption, production]
+  resolution: PT15M
+  coverage: {retrospective: P2Y, prospective: P1Y}
+  consent_text_version: "1.0"
+  revocable: true
+  retention: P2Y
+sharing_offers:
+  - {<<: *release, id: ex-incentive, purpose: IncentiveEstimation, recipients: {recipient: example-rec}, requires_offers: [ex-release]}
+  - {<<: *release, id: ex-flexibility, purpose: FlexibilityResearch, recipients: {recipient: example-rec}, requires_offers: [ex-release]}
+  - {<<: *release, id: ex-forecasting, purpose: EnergyForecasting, recipients: {recipient: ex-platform}, requires_offers: [ex-release-platform]}
+  - {<<: *release, id: ex-release, recipients: {recipient: example-rec}}
+  - {<<: *release, id: ex-release-platform, recipients: {recipient: ex-platform}}

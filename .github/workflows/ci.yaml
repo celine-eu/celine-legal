@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - run: uv run pytest -q
+      - name: The example renders as a draft, and lays out as a (still empty) stable site
+        run: |
+          uv run legal-build --data data/example --mode sample --out /tmp/site-draft
+          uv run legal-build --data data/example --mode final --out /tmp/site-stable
+
+  private-names:
+    name: No private name
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check
+        env:
+          NAMES: ${{ secrets.LEGAL_PRIVATE_NAMES }}
+        run: |
+          printf '%s\n' "$NAMES" > "$RUNNER_TEMP/private-names"
+          LEGAL_PRIVATE_NAMES="$RUNNER_TEMP/private-names" scripts/check-private-names.sh

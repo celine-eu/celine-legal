@@ -1,0 +1,8 @@
+{% extends "page/base.html.j2" %}
+{% from "page/_macros.html.j2" import name %}
+{% block title %}{{ w.pending }}{% endblock %}
+{% block body %}
+<h1>{{ w.pending }}</h1>
+<p>{{ w.pendingNote }}{% if view.organisation and view.organisation.owner != "platform" %} ({{ name(view.organisation) }}){% endif %}</p>
+<p><a href="{{ "/" | u }}">{{ w.home }}</a></p>
+{% endblock %}

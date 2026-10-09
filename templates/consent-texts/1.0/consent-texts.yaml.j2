@@ -1,0 +1,37 @@
+{#- The consent texts, generated from the offers (D13).
+
+    One text per consent-based offer, written by the template of the offer's purpose,
+    purposes/<purpose>.j2: its `title` and `body` macros take the language, the offer and
+    the offer's recipient (party_by_alias[offer.recipients.recipient]) and read the
+    community (`rec`), its grid operator (`dso`, the holder of the readings), the platform
+    operator and the project from the context. Two offers of one purpose with different
+    recipients differ by the recipient's `kind`, never by offer id.
+
+    Order: each access offer (one that requires no other), in the offers' order, then the
+    offers that require it, by id. -#}
+{% set consent = 'https://w3id.org/dpv#Consent' %}
+{% set consented = offers | selectattr('legal_basis', 'equalto', consent) | list %}
+{% macro entry(offer) %}
+{% set recipient = party_by_alias[offer.recipients.recipient] %}
+{% import 'consent-texts/1.0/purposes/' ~ offer.purpose ~ '.j2' as purpose with context %}
+  {{ offer.id }}:
+    version: "{{ offer.consent_text_version }}"
+{% for lang in doc.langs %}
+    {{ lang }}:
+      title: "{{ purpose.title(lang, offer, recipient) | replace('"', '\\"') }}"
+      body: |-
+        {{ purpose.body(lang, offer, recipient) | trim | indent(8) }}
+{% endfor %}
+
+{% endmacro %}
+# What a {{ rec.short }} member reads for each sharing offer, per language.
+# Reviewer notes: consent-texts.notes.md. Checked by `task local:consent-texts`.
+status: {{ doc.status }}
+
+texts:
+{% for access in consented if not access.get('requires_offers') %}
+{{ entry(access) }}
+{%- for use in consented | sort(attribute='id') if access.id in (use.get('requires_offers') or []) %}
+{{ entry(use) }}
+{%- endfor %}
+{% endfor %}

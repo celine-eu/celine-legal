@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "history.schema.json",
+  "title": "<legal host>/<owner>/history.json: every published version of each slot",
+  "description": "Oldest first. An acceptance recorded with a date and no version maps to the newest entry whose published_at is at or before that date (celine.legal.build.version_at).",
+  "type": "object",
+  "required": ["owner", "mode", "slots"],
+  "properties": {
+    "owner": {"type": "string"},
+    "mode": {"enum": ["sample", "final"]},
+    "slots": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["version", "published_at"],
+          "properties": {
+            "version": {"type": "string"},
+            "published_at": {"type": ["string", "null"]},
+            "release": {"type": "string", "pattern": "^v\\d+\\.\\d+\\.\\d+$", "description": "The stable release the version was published in"},
+            "paths": {"type": "object"},
+            "texts": {"type": "object"},
+            "sha256": {"type": ["object", "string", "null"]},
+            "url": {"type": ["string", "null"]}
+          }
+        }
+      }
+    }
+  }
+}

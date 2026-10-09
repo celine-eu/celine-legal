@@ -1,0 +1,7 @@
+documents:
+- id: statute-2024-01
+  title: Statuto
+  source: https://rec.example.org/statute.pdf
+  fetched: '2024-01-15'
+  original: statute.pdf
+  sha256: '0000000000000000000000000000000000000000000000000000000000000000'

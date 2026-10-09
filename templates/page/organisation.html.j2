@@ -1,0 +1,12 @@
+{% extends "page/base.html.j2" %}
+{% from "page/_macros.html.j2" import listing, name %}
+{% block title %}{{ w.documentsOf }} {{ name(view.organisation) }}{% endblock %}
+{% block body %}
+<h1>{{ w.documentsOf }} {{ name(view.organisation) }}</h1>
+{{ listing(view.documents) }}
+<section>
+<h2>{{ w.platform }}</h2>
+<p class="note">{{ w.platformNote }}</p>
+{{ listing(view.platform) }}
+</section>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "page/base.html.j2" %}
+{% block title %}{{ message }}{% endblock %}
+{% block body %}
+<h1>{{ message }}</h1>
+<p><a href="{{ "/" | u }}">{{ w.home }}</a></p>
+{% endblock %}

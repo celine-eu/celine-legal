@@ -1,0 +1,51 @@
+{#- MeterDataRelease: the member asks the grid operator holding the readings (`dso`) to
+    release them to the offer's recipient. Released to the community itself, the
+    readings are "released"; to another party, they are "made available" and the text
+    says who that party is. The sentence on what depends on the release lists the
+    consent offers that require this one, in the offers' order, by their purpose's
+    `noun`. -#}
+{% import 'consent-texts/1.0/common.j2' as c with context %}
+{% import 'macros/text.j2' as text %}
+
+{% macro title(lang, offer, recipient) %}
+{{- 'Accesso ai dati di misura del contatore' if lang == 'it' else 'Access to my meter readings' -}}
+{% endmacro %}
+
+{#- "La stima dell'incentivo e la sperimentazione sulla flessibilità usano questi dati" -#}
+{% macro dependents(lang, offer) %}
+{%- set ns = namespace(nouns=[], plural=false) -%}
+{%- for use in offers if use.legal_basis == offer.legal_basis and offer.id in (use.get('requires_offers') or []) -%}
+{%- import 'consent-texts/1.0/purposes/' ~ use.purpose ~ '.j2' as purpose with context -%}
+{%- set ns.nouns = ns.nouns + [purpose.noun(lang)] -%}
+{%- set ns.plural = ns.plural or purpose.plural or ns.nouns | length > 1 -%}
+{%- endfor -%}
+{%- if lang == 'it' -%}
+{{ text.cap(text.join(ns.nouns, 'it')) }} {{ 'usano' if ns.plural else 'usa' }} questi dati
+{%- else -%}
+{{ text.cap(text.join(ns.nouns, 'en')) }} {{ 'use' if ns.plural else 'uses' }} this data
+{%- endif -%}
+{% endmacro %}
+
+{% macro body(lang, offer, recipient) %}
+{% set to_community = recipient.kind == 'rec' %}
+{% set role = c.role(lang, recipient) %}
+{% if lang == 'it' %}
+{% if to_community %}
+Chiedo a {{ dso.short }}, che gestisce il mio contatore, di rilasciare a {{ c.name(recipient) }} le misure del mio punto di prelievo (POD): {{ c.readings(lang, offer, 'full') }}.
+{% else %}
+Chiedo a {{ dso.short }}, che gestisce il mio contatore, di rendere disponibili a {{ c.name(recipient) }} le misure del mio punto di prelievo (POD): {{ c.readings(lang, offer, 'full') }}.
+{% endif %}
+Per questo {{ rec.short }} comunica a {{ dso.short }} il codice del POD riferito alla mia adesione.
+{% if role %}{{ recipient.short }} {{ role }}. {% endif %}{{ dependents(lang, offer) }}: senza questo consenso i miei dati di misura non vengono {{ 'rilasciati' if to_community else 'resi disponibili' }} a {{ recipient.short }}.
+{{ c.optional(lang) }}: {{ c.after_withdrawal(lang, 'release') }}.
+{% else %}
+{% if to_community %}
+I ask {{ dso.short }}, which operates my meter, to release to {{ c.name(recipient) }} the readings of my supply point (POD): {{ c.readings(lang, offer, 'full') }}.
+{% else %}
+I ask {{ dso.short }}, which operates my meter, to make the readings of my supply point (POD) available to {{ c.name(recipient) }}: {{ c.readings(lang, offer, 'full') }}.
+{% endif %}
+For this, {{ rec.short }} gives {{ dso.short }} the code of the POD referring to my membership.
+{% if role %}{{ recipient.short }} {{ role }}. {% endif %}{{ dependents(lang, offer) }}: without this consent my meter readings are not {{ 'released' if to_community else 'made available' }} to {{ recipient.short }}.
+{{ c.optional(lang) }}: {{ c.after_withdrawal(lang, 'release') }}.
+{% endif %}
+{% endmacro %}

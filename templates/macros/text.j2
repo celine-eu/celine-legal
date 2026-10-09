@@ -1,0 +1,27 @@
+{#- Text helpers shared by the templates. Import with
+    {% import 'macros/text.j2' as text %}. -#}
+
+{#- A paragraph or list item that names an actor, wrapped at 88 columns so that the
+    rendered text reflows whatever the names are. `lead` is the item's marker with its
+    indentation ('- ', '  - ', '1. '); continuation lines are indented under the text.
+    Ends with a newline. Use it as
+    {% call text.wrap('- ') %}words {{ value }} words{% endcall %} -#}
+{% macro wrap(lead='', width=88) %}
+{{ lead }}{{ caller().split() | join(' ') | wordwrap(width - lead | length, false, '\n' ~ ' ' * (lead | length), false) }}
+{% endmacro %}
+
+{#- An English possessive: "Labs'" or "Land's". -#}
+{% macro poss(name) %}{{ name }}{{ "'" if name.endswith('s') else "'s" }}{% endmacro %}
+
+{#- A list of phrases joined as prose: "a", "a and b", "a, b and c" ("e" in Italian). -#}
+{% macro join(items, lang) %}
+{%- set conj = ' e ' if lang == 'it' else ' and ' -%}
+{%- if items | length > 1 -%}
+{{ items[:-1] | join(', ') }}{{ conj }}{{ items[-1] }}
+{%- else -%}
+{{ items | join('') }}
+{%- endif -%}
+{% endmacro %}
+
+{#- A phrase with its first letter in capitals, the rest as it is. -#}
+{% macro cap(phrase) %}{{ phrase[:1] | upper }}{{ phrase[1:] }}{% endmacro %}

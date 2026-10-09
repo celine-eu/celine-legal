@@ -1,0 +1,48 @@
+{#- ISO 8601 durations (P2Y, P6M, P30D, PT15M, PT1H) as the texts say them. Import with
+    {% import 'macros/durations.j2' as durations %}. -#}
+
+{#- unit letter (T-prefixed for a time part) → it singular, it plural, en singular,
+    en plural, Italian gender -#}
+{% set units = {
+  'Y': ['anno', 'anni', 'year', 'years', 'm'],
+  'M': ['mese', 'mesi', 'month', 'months', 'm'],
+  'W': ['settimana', 'settimane', 'week', 'weeks', 'f'],
+  'D': ['giorno', 'giorni', 'day', 'days', 'm'],
+  'TH': ['ora', 'ore', 'hour', 'hours', 'f'],
+  'TM': ['minuto', 'minuti', 'minute', 'minutes', 'm'],
+} %}
+
+{% macro count(duration) %}{{ duration[2:-1] if duration.startswith('PT') else duration[1:-1] }}{% endmacro %}
+
+{% macro _unit(duration) %}{{ ('T' if duration.startswith('PT') else '') ~ duration[-1] }}{% endmacro %}
+
+{#- "2 anni", "1 anno", "2 years", "1 year"; with adjective=true in English "15-minute". -#}
+{% macro span(duration, lang, adjective=false) %}
+{%- set n = count(duration) -%}
+{%- set names = units[_unit(duration)] -%}
+{%- if lang == 'it' -%}
+{{ n }} {{ names[0] if n == '1' else names[1] }}
+{%- elif adjective -%}
+{{ n }}-{{ names[2] }}
+{%- else -%}
+{{ n }} {{ names[2] if n == '1' else names[3] }}
+{%- endif -%}
+{% endmacro %}
+
+{#- An Italian adjective agreeing with the duration: `forms` is
+    [masculine singular, masculine plural, feminine singular, feminine plural]. -#}
+{% macro agree(duration, forms) %}
+{%- set plural = count(duration) != '1' -%}
+{%- set feminine = units[_unit(duration)][4] == 'f' -%}
+{{ forms[(2 if feminine else 0) + (1 if plural else 0)] }}
+{%- endmacro %}
+
+{#- "2 anni precedenti" / "2 years before" -#}
+{% macro before(duration, lang) %}
+{{- span(duration, lang) }} {{ agree(duration, ['precedente', 'precedenti', 'precedente', 'precedenti']) if lang == 'it' else 'before' -}}
+{% endmacro %}
+
+{#- "1 anno successivo" / "1 year after" -#}
+{% macro after(duration, lang) %}
+{{- span(duration, lang) }} {{ agree(duration, ['successivo', 'successivi', 'successiva', 'successive']) if lang == 'it' else 'after' -}}
+{% endmacro %}

@@ -1,0 +1,235 @@
+{# A name closing a sentence: one full stop, also after "S.p.A.". #}
+{% macro dot(name) %}{{ name }}{{ "" if name.endswith(".") else "." }}{% endmacro %}
+{# Possessive of a name: "Acme's", "Labs'". #}
+{% macro poss(name) %}{{ name }}{{ "'" if name.endswith("s") else "'s" }}{% endmacro %}
+{# A party's address line: the registered office, then the country once there is one. #}
+{% macro address(p) %}{{ p.registered_office }}{% if p.registered_office != "[•]" %}, {{ p.country.en }}{% endif %}{% endmacro %}
+{% macro tax(p) %}{% if p.tax_code != "[•]" and p.vat is defined and p.vat == p.tax_code %}Tax code and VAT: {{ p.tax_code }}{% elif p.tax_code != "[•]" and p.vat is defined and p.vat != "[•]" %}Tax code: {{ p.tax_code }}; VAT: {{ p.vat }}{% else %}Tax code {{ p.tax_code }}{% endif %}{% endmacro %}
+{% macro region(p) %}{{ "European Union" if p.region == "eu" else p.region }}{% endmacro %}
+{# The grid operator's key in the parties file, and the communities of this deployment. #}
+{% set dso_key = parties | dictsort | selectattr(1, "sameas", dso) | map(attribute=0) | first %}
+{% set communities = party_by_alias.values() | selectattr("kind", "equalto", "rec") | map(attribute="short") | list %}
+---
+document: data-processing-agreement
+dso: {{ dso_key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Data processing agreement
+
+**Under Article 28 of Regulation (EU) 2016/679 (GDPR) — version {{ doc.version }}**
+
+## Parties
+
+- **Controller: {{ dot(dso.name) }}**
+  - Address: {{ address(dso) }}.
+  - {{ tax(dso) }}.
+  - Represented by {{ dso.representative }}.
+- **Processor: {{ dot(platform.name) }}**
+  - Address: {{ address(platform) }}.
+  - {{ tax(platform) }}.
+  - Represented by {{ platform.representative }}.
+
+## 1. Subject matter
+
+The Processor operates {{ poss(dso.short) }} node in the {{ project.name }} dataspace, made up of:
+
+- its dataspace connector and identity;
+- its consent record;
+- the data service that serves meter readings to authorised recipients.
+
+This agreement sets out the terms on which the Processor processes personal data on the
+Controller's behalf in doing so. Annex 1 describes the processing, Annex 2 the security
+measures and Annex 3 the sub-processors.
+
+The release of readings is governed by the member meter data sharing agreement between
+{{ communities | join(', ') }}, {{ dso.short }} and {{ platform.short }}. This agreement governs only the
+Processor's operation of the node.
+
+## 2. Duration
+
+This agreement applies for as long as the Processor operates the node for the
+Controller, subject to clause 11.
+
+## 3. Instructions
+
+The Processor processes the personal data only on the Controller's documented
+instructions, including for any transfer outside the European Economic Area. This
+agreement and the node's configuration agreed with the Controller are those
+instructions. In particular, the node:
+
+- serves readings only for supply points whose release consent is current, and only
+  within the period that consent covers;
+- serves them only to the recipient that the consent names.
+
+The only exception is where Union or Member State law requires otherwise; the Processor
+then informs the Controller before processing, unless that law prohibits it.
+
+The Processor informs the Controller immediately if, in its opinion, an instruction
+infringes data protection law.
+
+## 4. The Processor's own processing
+
+The Processor does not use personal data processed under this agreement for its own
+purposes.
+
+The Processor is a separate, independent controller of the readings it **receives from
+the node as a recipient**, under a member's consent to "Access to my meter readings" for
+{{ platform.short }}. That processing is governed by the member meter data sharing agreement
+and by the consent. The Processor obtains those readings through its own connector,
+under the same checks as any other recipient. It does not obtain them through its access
+as operator of the node.
+
+## 5. Confidentiality
+
+The Processor ensures that every person authorised to process the personal data:
+
+- has committed to confidentiality, or is under a statutory obligation of
+  confidentiality;
+- has access only to what their task requires.
+
+## 6. Security
+
+The Processor implements the measures in Annex 2 and keeps them appropriate to the risk
+(Article 32 GDPR). It may replace a measure with one that is at least as effective, and
+informs the Controller of material changes.
+
+## 7. Sub-processors
+
+The Controller gives general authorisation for the sub-processors in Annex 3.
+
+**Adding or replacing a sub-processor:**
+
+- The Processor informs the Controller at least 30 days in advance.
+- The Controller may object on reasonable data-protection grounds within that period.
+- If the objection cannot be resolved, the Controller may end the service without
+  penalty.
+
+**Obligations passed on:** the Processor imposes the same data-protection obligations
+on each sub-processor by contract. It remains fully liable for each sub-processor's
+performance.
+
+## 8. Location
+
+The personal data is processed in the European Economic Area only, on {{ providers.hosting.brand }}
+infrastructure in the European Union and on the Processor's own infrastructure in
+{{ platform.city }}, {{ platform.country.en }}.
+
+The node is designed so that it can be moved to the Controller's own infrastructure. On
+the Controller's request, the Processor assists with that move.
+
+## 9. Assistance
+
+The Processor assists the Controller in:
+
+- responding to data subjects' requests under Articles 15–22 GDPR, forwarding any
+  request it receives directly within 5 working days;
+- meeting the obligations of Articles 32–36 GDPR.
+
+It also gives the Controller access, at any time, to the consent record and the
+disclosure record of its node, so that the Controller can check and demonstrate each
+release.
+
+## 10. Personal data breaches
+
+The Processor notifies the Controller of a personal data breach without undue delay,
+and in any case within **24 hours** of becoming aware of it.
+
+**What the notice contains**, as far as known at the time (Article 33(3) GDPR):
+
+- the nature of the breach;
+- the categories and approximate numbers of data subjects and records concerned;
+- its likely consequences;
+- the measures taken or proposed.
+
+## 11. End of the service
+
+When the service ends, the Processor, at the Controller's choice:
+
+- returns the personal data, including the consent and disclosure records, in a common
+  machine-readable format;
+- or deletes it.
+
+It deletes the remaining copies within 60 days, including backups when they expire,
+unless Union or Member State law requires retention. It confirms the deletion in
+writing.
+
+## 12. Records, audits and inspections
+
+**Records:** the Processor keeps the record required by Article 30(2) GDPR.
+
+**Information:** it makes available the information needed to demonstrate compliance.
+
+**Audits:**
+
+- The Processor allows and contributes to audits by the Controller or an auditor it
+  mandates.
+- Notice: at least 15 working days, except after a breach.
+- Frequency: once a year at most, except after a breach or at an authority's request.
+
+## 13. Liability
+
+Each party is liable as provided by Article 82 GDPR.
+
+## 14. Law and jurisdiction
+
+This agreement is governed by Italian law. The courts of {{ platform.forum.en }} have exclusive
+jurisdiction.
+
+## Annex 1 — Description of the processing
+
+| | |
+|---|---|
+| **Service** | Operation of the Controller's dataspace node: connector, identity, consent record, disclosure record and the data service for meter readings |
+| **Nature** | Hosting, storage, consent checking, release to authorised recipients, recording, backup and deletion |
+| **Purpose** | Releasing meter readings to the recipients that the members' consents name, and demonstrating each release |
+| **Data subjects** | Members of renewable energy communities whose supply points are connected to the Controller's network and who have taken a decision on the release of their readings |
+| **Categories of data** | Supply point code (POD); meter readings of that POD (energy drawn and fed in, 15-minute intervals); the release decisions and their history; records of each release |
+| **Not processed** | Names, contact details or tax codes of the members |
+| **Retention** | Readings: as instructed by the Controller, and no longer than the period the consent covers. Consent and release records: as long as the Controller must be able to demonstrate the releases, as instructed |
+
+## Annex 2 — Technical and organisational measures
+
+**Isolation:** the Controller's node has its own database, its own credentials and its
+own connector. It shares no database and no credential with any other participant.
+
+**Consent checking:** every request is checked against the current consent before any
+reading is served. Each release is recorded.
+
+**Access and identity:**
+
+- Machine-to-machine access only, with credentials issued to authorised participants.
+- Administrative access is by named staff with multi-factor authentication.
+
+**Encryption:**
+
+- TLS on every external connection.
+- Storage encrypted at rest.
+- Secrets kept encrypted.
+
+**Availability:** database backups within the European Economic Area.
+
+**People:**
+
+- Confidentiality commitments.
+- Least-privilege access.
+- Access is removed when a person leaves.
+
+## Annex 3 — Authorised sub-processors
+
+| Sub-processor | Service | Location |
+|---|---|---|
+{% for p in providers.values() if p.sub_processor is defined and p.sub_processor and p.dpa_service is defined and p.dpa_service.dso is defined %}
+| {{ p.name }}{% if p.address is defined %}, {{ p.address }}{% endif %} | {{ p.dpa_service.dso.en }} | {{ region(p) }} |
+{% endfor %}
+
+## Signatures
+
+{# Signature cells are filled in by hand at signing: a draft shows the blank, a final edition an empty cell. #}
+{% set to_sign = '' if doc.status == 'final' else '[•]' %}
+| Party | Name and role | Date | Signature |
+|---|---|---|---|
+| {{ dso.short }} (Controller) | {{ to_sign }} | {{ to_sign }} | |
+| {{ platform.short }} (Processor) | {{ to_sign }} | {{ to_sign }} | |

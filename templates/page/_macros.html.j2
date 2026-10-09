@@ -1,0 +1,8 @@
+{% macro listing(items) %}
+<ul class="listing">
+{% for item in items %}
+<li><a href="{{ item.url | u }}">{{ item.title }}</a>{% if item.version %} <span class="meta">{{ item.version }}</span>{% endif %}</li>
+{% endfor %}
+</ul>
+{% endmacro %}
+{% macro name(o) %}{{ o.short or o.name or o.owner }}{% endmacro %}

@@ -1,0 +1,8 @@
+{% extends "page/base.html.j2" %}
+{% from "page/_macros.html.j2" import name %}
+{% block title %}{{ view.title or view.slot }}{% endblock %}
+{% block body %}
+<h1>{{ view.title or view.slot }}</h1>
+{% set o = view.organisation %}
+<p>{{ w.unavailable }}{% if o.email or o.pec %} {{ w.requestCopy }} {{ name(o) }}: {{ [o.email, o.pec] | select | join(", ") }}.{% endif %}</p>
+{% endblock %}

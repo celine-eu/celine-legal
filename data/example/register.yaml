@@ -1,0 +1,44 @@
+# Every template, rendered for the example deployment, final: a final edition must render
+# no blank, so this also proves no template types one.
+# The optional features the texts describe. Every one is declared; a deployment overrides
+# one with LEGAL_FEATURE_<NAME>=true|false. The tests render the example under each.
+features:
+  sms_verification: true
+  document_extraction: true
+  ai_assistant: true
+  dso_data_exchange: true
+
+recs:
+  example-rec:
+    identity: recs/example-rec/identity.yaml
+    dso: example-dso
+    roles:
+      privacy: example-rec/app-privacy-notice
+      terms: example-rec/terms-of-use
+      data_sharing_notice: example-rec/data-sharing-privacy-notice
+      statute: example-rec/statute
+  # A second community on the same deployment: its members must get its own documents.
+  example-rec-2:
+    identity: recs/example-rec-2/identity.yaml
+    dso: example-dso
+    roles:
+      privacy: example-rec-2/app-privacy-notice
+      terms: example-rec-2/terms-of-use
+
+platform_roles:
+  sub_processors: platform/sub-processors
+  participation_agreement: dataspace/participation-agreement
+
+documents:
+  - {id: example-rec/consent-texts, kind: consent-texts, template: consent-texts, version: "1.0", for: {rec: example-rec}, langs: [it, en], status: final}
+  - {id: example-rec/app-privacy-notice, template: app-privacy-notice, version: "0.1", for: {rec: example-rec}, langs: [it, en], status: final}
+  - {id: example-rec/terms-of-use, template: terms-of-use, version: "0.1", for: {rec: example-rec}, langs: [it, en], status: final}
+  - {id: example-rec/data-sharing-privacy-notice, template: data-sharing-privacy-notice, version: "0.2", for: {rec: example-rec}, langs: [it, en], status: final}
+  - {id: example-rec/data-sharing-agreement, template: data-sharing-agreement, version: "0.2", for: {rec: example-rec}, langs: [en], status: final, acceptance: signature}
+  - {id: example-rec/data-processing-agreement, template: rec-data-processing-agreement, version: "0.1", for: {rec: example-rec}, langs: [en], status: final, acceptance: signature}
+  - {id: example-dso/data-processing-agreement, template: dso-data-processing-agreement, version: "0.1", for: {dso: example-dso}, langs: [en], status: final, acceptance: signature}
+  - {id: platform/sub-processors, template: sub-processors, version: "0.1", langs: [it, en], status: final}
+  - {id: dataspace/participation-agreement, template: participation-agreement, version: "0.2", langs: [it, en], status: final}
+  - {id: example-rec-2/app-privacy-notice, template: app-privacy-notice, version: "0.1", for: {rec: example-rec-2}, langs: [it, en], status: final}
+  - {id: example-rec-2/terms-of-use, template: terms-of-use, version: "0.1", for: {rec: example-rec-2}, langs: [it, en], status: final}
+  - {id: example-rec/statute, external: true, version: "2024-01", title: "Statuto", publish: "https://rec.example.org/statute.pdf", files: {it: recs/example-rec/baseline/statute.pdf}}

@@ -1,0 +1,17 @@
+# A deployment's data never enters this repository: only the example does. Keep your
+# deployment's data in its own (private) repository and mount it (LEGAL_DATA).
+/data/*
+!/data/example/
+!/data/README.md
+
+# Names that must never appear here (scripts/check-private-names.sh); one per line.
+.private-names
+
+# Rendered output (`legal-build --out`).
+/build/
+/site/
+
+__pycache__/
+.venv/
+/dist/
+.pytest_cache/

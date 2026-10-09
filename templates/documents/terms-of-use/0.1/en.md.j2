@@ -1,0 +1,157 @@
+---
+document: terms-of-use
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Terms of use of the {{ rec.short }} digital platform
+
+**Version {{ doc.version }}**
+
+## 1. Who provides the service
+
+{% filter wordwrap(88) %}
+The digital platform of the energy community is provided by **{{ rec.name }}**. It covers the online membership application, the community app{{ ', the AI assistant' if features.ai_assistant else '' }} and notifications.
+{%- endfilter +%}
+
+- Address: {{ rec.registered_office }}, {{ rec.country.en }}.
+- Tax code and VAT: {{ rec.tax_code }}.
+- Email: {{ rec.email }}.
+- PEC: {{ rec.pec }}.
+
+**{{ platform.name }}** operates the platform on {{ rec.short }}'s behalf.
+
+The platform is developed in the {{ project.name }} research project, funded by the European Union
+under the {{ project.programme }} programme (grant agreement No. {{ project.grant_agreement }}).
+
+## 2. What these terms are
+
+These terms govern the use of the platform. They do not replace or amend:
+
+- {{ rec.short }}'s statute;
+- the energy community's rules;
+- the resolutions of its governing bodies.
+
+Those continue to govern your relationship with the cooperative, and they prevail in
+case of conflict.
+
+The platform's privacy notice describes how your data is processed.
+
+## 3. Who can use the platform
+
+- **The membership application** is open to anyone who wishes to become a member of
+  {{ rec.short }}.
+- **The community app** is for admitted members only.
+  - Access is personal. Do not share your credentials.
+  - Tell {{ rec.short }} if you think someone else has used them.
+- If you use the platform on behalf of a business or an organisation, you confirm that
+  you are authorised to do so.
+
+## 4. What it offers
+
+The app lets you:
+
+- see the consumption and production of the meters and devices registered to you;
+- see forecasts, estimates and suggestions for shifting consumption;
+- take on commitments to suggestions, and collect points and badges;
+- receive notifications;
+{% if features.ai_assistant %}
+- use the AI assistant;
+{% endif %}
+{% if features.dso_data_exchange %}
+- decide on the sharing of your meter readings;
+{% endif %}
+- send feedback.
+
+Features may change during the project. {{ rec.short }} announces relevant changes in the
+app.
+
+## 5. Forecasts, estimates and suggestions
+
+- **Information only:** forecasts, estimates and suggestions are for information.
+- **The incentive estimate** does not replace GSE's official calculation. What you are
+  entitled to is determined by the community's statute and rules.
+- **Suggestions** are optional. Following them or not has no consequence for your
+  membership.
+- **Points and badges** are a way to take part in community life. They have no monetary
+  value, unless the community rules or a resolution provide otherwise.
+
+{% set skip = 0 if features.ai_assistant else 1 %}
+{% if features.ai_assistant %}
+## 6. The AI assistant
+
+- **What it is:** an **artificial intelligence system**. It answers using your data on
+  the platform, with your own permissions.
+- **Its answers can be wrong or incomplete.** They are not technical, legal, tax or
+  financial advice. Check important information with {{ rec.short }}.
+- **Do not attach** identity documents, health data or other people's personal data.
+- You can delete your conversations and attachments at any time.
+
+{% endif %}
+## {{ 7 - skip }}. Proper use
+
+When you use the platform, you agree:
+
+- to give true and up-to-date information;
+- not to access other members' data, and not to try to get around the platform's
+  protections;
+- not to use the platform{{ ', including the assistant,' if features.ai_assistant else '' }} for unlawful or offensive purposes,
+  or for purposes unrelated to the community;
+- not to upload content that infringes the rights of others;
+- not to interfere with the platform's operation, for example through unauthorised
+  automated access.
+
+## {{ 8 - skip }}. Availability
+
+- **Effort, not a guarantee:** the platform is developed and improved within a research
+  project. {{ rec.short }} endeavours to keep it available and secure, but cannot guarantee
+  that it always works without interruption or error.
+- **Maintenance:** planned maintenance is announced in the app where possible.
+- **Data delays:** the data shown may be delayed or incomplete, for example while the
+  grid operator has not yet made it available.
+
+## {{ 9 - skip }}. Suspension and termination
+
+- You can stop using the app at any time.
+- Your account is deactivated when your membership ends.
+- {{ rec.short }} may suspend access for a serious breach of these terms, or to protect the
+  platform's security. It tells you why, unless the law prevents it.
+- After termination, your data is handled as described in the platform's privacy notice.
+
+## {{ 10 - skip }}. Intellectual property
+
+- **Software:** the platform's software is distributed by the {{ project.name }} project under open
+  source licences, stated in the respective repositories.
+- **Your content:** what you enter, such as messages and feedback, remains yours. You
+  grant {{ rec.short }} the use needed to provide the service to you.
+
+## {{ 11 - skip }}. Liability
+
+- {{ rec.short }} is liable for damage caused wilfully or through gross negligence, and for
+  any other liability that the law does not allow to be excluded.
+- To the extent the law allows, {{ rec.short }} is not liable for decisions taken solely on
+  the basis of {{ 'forecasts, estimates, suggestions or answers from the assistant' if features.ai_assistant else 'forecasts, estimates or suggestions' }}.
+- If you are a consumer, your rights under the Italian Consumer Code are unaffected.
+
+## {{ 12 - skip }}. Changes
+
+- {{ rec.short }} may change these terms because of changes to the service, the law or the
+  project.
+- The new version is shown to you at your next login, and applies from when you accept
+  it.
+- If you do not accept it, you can stop using the app. Your membership is not affected.
+
+## {{ 13 - skip }}. Governing law and disputes
+
+- **Law:** these terms are governed by Italian law.
+- **Conciliation:** disputes between {{ rec.short }} and its members are subject to the
+  conciliation clause of the statute.
+- **Court:** if you are a consumer, the court of the place where you live has
+  jurisdiction.
+
+## {{ 14 - skip }}. Contacts
+
+- **Questions about these terms:** {{ rec.email }}.
+- **Privacy:** {{ rec.privacy_contact }}.

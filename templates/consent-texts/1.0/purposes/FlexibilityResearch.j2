@@ -1,0 +1,26 @@
+{#- FlexibilityResearch: the recipient uses the readings it receives from the grid
+    operator for the community's flexibility pilot in the funding research project.
+    The pilot's description is this purpose's own wording. `noun` and `plural` are how
+    an access offer this one requires names it. -#}
+{% import 'consent-texts/1.0/common.j2' as c with context %}
+{% set plural = false %}
+
+{% macro title(lang, offer, recipient) %}
+{{- 'Sperimentazione sulla flessibilità' if lang == 'it' else 'Flexibility pilot' -}}
+{% endmacro %}
+
+{% macro noun(lang) %}
+{{- 'la sperimentazione sulla flessibilità' if lang == 'it' else 'the flexibility pilot' -}}
+{% endmacro %}
+
+{% macro body(lang, offer, recipient) %}
+{% if lang == 'it' %}
+Autorizzo {{ c.name(recipient) }} a usare le misure che riceve da {{ dso.short }} ({{ c.readings(lang, offer, 'brief') }}) per la sperimentazione sulla flessibilità della comunità nel progetto di ricerca europeo {{ project.name }}: stimare in quali momenti i consumi potrebbero essere spostati e valutare la fattibilità e la partecipazione dei soci.
+Non comporta alcun contratto di flessibilità né alcun impegno da parte mia.
+{{ c.optional(lang) }}: {{ c.after_withdrawal(lang, 'use') }}.
+{% else %}
+I allow {{ c.name(recipient) }} to use the readings it receives from {{ dso.short }} ({{ c.readings(lang, offer, 'brief') }}) for the community's flexibility pilot in the European research project {{ project.name }}: estimating when consumption could be shifted, and assessing feasibility and members' participation.
+It involves no flexibility contract and no commitment on my part.
+{{ c.optional(lang) }}: {{ c.after_withdrawal(lang, 'use') }}.
+{% endif %}
+{% endmacro %}

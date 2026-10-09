@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "current.schema.json",
+  "title": "<legal host>/<owner>/current.json: each slot's current document",
+  "description": "What an application reads to link a slot and to record an acceptance: the version, the page per language, the text per language and its sha256, and when the version was published (null for a draft, which only a sample host serves). The sha256 is taken over the text (the rendered markdown, front matter included), never over the HTML, so the page can be restyled without changing what was accepted.",
+  "type": "object",
+  "required": ["owner", "mode", "valid", "slots"],
+  "properties": {
+    "owner": {"type": "string"},
+    "mode": {"enum": ["sample", "final"], "description": "sample: a draft, served under /draft/<revision>/ for review; final: the stable site, published editions only"},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$", "description": "A draft: the commit of the deployment's data it was rendered from"},
+    "release": {"type": "string", "pattern": "^v\\d+\\.\\d+\\.\\d+$", "description": "A stable release: its version"},
+    "valid": {"type": "boolean", "description": "Whether an acceptance recorded against this host binds: true only in final mode"},
+    "features": {"type": "object", "additionalProperties": {"type": "boolean"}, "description": "A draft: the optional features its texts describe as on (true) or off (false). A published edition records its own (editions/index.yaml)"},
+    "pending": {"type": "array", "items": {"type": "string"}, "description": "The stable site: slots with no published version yet; their pages say the document is not yet available, and an application must not link them"},
+    "slots": {
+      "type": "object",
+      "additionalProperties": {"oneOf": [{"$ref": "#/$defs/published"}, {"$ref": "#/$defs/external"}]}
+    }
+  },
+  "$defs": {
+    "published": {
+      "type": "object",
+      "required": ["id", "version", "status", "published_at", "paths", "texts", "sha256", "titles"],
+      "properties": {
+        "id": {"type": "string"},
+        "version": {"type": "string"},
+        "status": {"enum": ["draft", "reviewed", "final"]},
+        "published_at": {"type": ["string", "null"]},
+        "paths": {"$ref": "#/$defs/by_lang"},
+        "texts": {"$ref": "#/$defs/by_lang"},
+        "sha256": {"$ref": "#/$defs/by_lang"},
+        "titles": {"$ref": "#/$defs/by_lang"},
+        "approval_sha256": {"$ref": "#/$defs/by_lang", "description": "A draft only: the sha256 each text will have once final, which the parties approve (register approved_sha256)"}
+      },
+      "additionalProperties": false
+    },
+    "external": {
+      "type": "object",
+      "required": ["id", "external", "version", "url", "sha256"],
+      "properties": {
+        "id": {"type": "string"},
+        "external": {"const": true},
+        "version": {"type": "string"},
+        "url": {"type": ["string", "null"]},
+        "title": {"type": ["string", "null"]},
+        "captured": {"type": ["string", "null"]},
+        "sha256": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "by_lang": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {"^[a-z]{2}$": {"type": "string"}},
+      "additionalProperties": false
+    }
+  }
+}

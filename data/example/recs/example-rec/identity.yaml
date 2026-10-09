@@ -1,0 +1,19 @@
+key: example-rec
+name: "Example Renewable Energy Community"
+short: "Example REC"
+display_name: "Example REC"
+kind: rec
+legal_form: "associazione di promozione sociale"
+registered_office: "Piazza Esempio 3, 00100 Exampletown (EX)"
+country: {it: "Italia", en: "Italy"}
+tax_code: "00000000003"
+vat: "00000000004"
+rea: "EX-000000"
+pec: "rec@pec.example.org"
+phone: "000 0000000"
+email: "info@rec.example.org"
+privacy_contact: "privacy@rec.example.org"
+dpo: "dpo@rec.example.org"
+website: "https://rec.example.org"
+forum: {it: "Exampletown", en: "Exampletown"}
+representative: "Carol Example"

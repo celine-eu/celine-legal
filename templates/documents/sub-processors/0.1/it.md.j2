@@ -1,0 +1,68 @@
+{# Possessive of a name: "Acme's", "Labs'". #}
+{% macro poss(name) %}{{ name }}{{ "'" if name.endswith("s") else "'s" }}{% endmacro %}
+{% macro region(p) %}{{ ("Unione europea" if doc.lang == "it" else "European Union") if p.region == "eu" else p.region }}{% endmacro %}
+---
+document: sub-processors
+scope: platform
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Fornitori e sub-responsabili della piattaforma
+
+**Versione {{ doc.version }}**
+
+{% if features.dso_data_exchange %}
+{{ platform.name }} gestisce, per conto delle comunità energetiche, la loro piattaforma
+digitale e, per conto dei gestori di rete partecipanti, i loro nodi nel dataspace. Questo
+{% else %}
+{{ platform.name }} gestisce, per conto delle comunità energetiche, la loro piattaforma
+digitale. Questo
+{% endif %}
+elenco indica i fornitori di cui {{ platform.short }} si avvale per questo servizio e gli altri
+servizi che la piattaforma contatta.
+
+## Sub-responsabili
+
+Questi fornitori trattano dati personali per conto di {{ platform.short }}. Lo fanno in base a un
+contratto con gli stessi obblighi di protezione dei dati di {{ platform.short }}.
+
+| Fornitore | Servizio | Dove |
+|---|---|---|
+{% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and (key != 'sms' or features.sms_verification) %}
+| {{ p.name }}{% if p.city is defined %}, {{ p.city[doc.lang] }}, {{ p.country[doc.lang] }}{% endif %} | {{ p.service[doc.lang] }} | {{ region(p) }} |
+{% endfor %}
+
+## Infrastruttura propria di {{ platform.short }}
+
+| Servizio | Dove |
+|---|---|
+{% if features.ai_assistant or features.document_extraction %}
+| {{ 'Assistente AI, e lettura' if features.ai_assistant and features.document_extraction else 'Assistente AI' if features.ai_assistant else 'Lettura' }}{{ " di bollette e documenti d'identità nella domanda di adesione" if features.document_extraction else '' }}: modello linguistico a pesi aperti su un server di proprietà di {{ platform.short }} | {{ platform.city }}, {{ platform.country.it }} |
+{% endif %}
+| Servizi della piattaforma sull'infrastruttura propria di {{ platform.short }} | {{ platform.city }}, {{ platform.country.it }} |
+
+{% if features.ai_assistant or features.document_extraction %}
+Nessun dato personale è inviato a fornitori esterni di intelligenza artificiale.
+
+{% endif %}
+## Altri servizi contattati dalla piattaforma
+
+Questi servizi non sono sub-responsabili. Ricevono solo ciò che serve al compito
+indicato, senza il nome dell'utente.
+
+| Servizio | Che cosa riceve | Perché |
+|---|---|---|
+| {{ providers.maps.name }}, {{ providers.maps.country.it }} ({{ providers.maps.products.it }}) | L'indirizzo di fornitura, e l'indirizzo IP del browser che mostra una mappa | Localizzare l'indirizzo di fornitura nell'area della comunità; mostrare le mappe |
+| Il servizio push del browser dell'utente (ad esempio Google, Mozilla o Apple) | Una notifica cifrata, che il servizio push non può leggere | Consegnare le notifiche push autorizzate dall'utente |
+
+## Modifiche
+
+{% if features.dso_data_exchange %}
+Le comunità e i gestori di rete serviti da {{ platform.short }} sono informati di ogni nuovo
+{% else %}
+Le comunità servite da {{ platform.short }} sono informate di ogni nuovo
+{% endif %}
+sub-responsabile, o di ogni sostituzione, almeno 30 giorni prima. Questo elenco riporta
+la versione in vigore e la sua data.

@@ -1,0 +1,64 @@
+{# Possessive of a name: "Acme's", "Labs'". #}
+{% macro poss(name) %}{{ name }}{{ "'" if name.endswith("s") else "'s" }}{% endmacro %}
+{% macro region(p) %}{{ ("Unione europea" if doc.lang == "it" else "European Union") if p.region == "eu" else p.region }}{% endmacro %}
+---
+document: sub-processors
+scope: platform
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Platform providers and sub-processors
+
+**Version {{ doc.version }}**
+
+{% if features.dso_data_exchange %}
+{{ platform.name }} operates the digital platform of the energy communities, and the
+dataspace nodes of the participating grid operators, on their behalf. This list names
+{% else %}
+{{ platform.name }} operates the digital platform of the energy communities on their behalf.
+This list names
+{% endif %}
+the providers that {{ platform.short }} uses for that service, and the other services the
+platform contacts.
+
+## Sub-processors
+
+These providers process personal data for {{ platform.short }}, under a contract with the same
+data-protection obligations as {{ poss(platform.short) }} own.
+
+| Provider | Service | Where |
+|---|---|---|
+{% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and (key != 'sms' or features.sms_verification) %}
+| {{ p.name }}{% if p.city is defined %}, {{ p.city[doc.lang] }}, {{ p.country[doc.lang] }}{% endif %} | {{ p.service[doc.lang] }} | {{ region(p) }} |
+{% endfor %}
+
+## {{ poss(platform.short) }} own infrastructure
+
+| Service | Where |
+|---|---|
+{% if features.ai_assistant or features.document_extraction %}
+| {{ 'AI assistant, and reading' if features.ai_assistant and features.document_extraction else 'AI assistant' if features.ai_assistant else 'Reading' }}{{ ' of bills and identity documents in the membership application' if features.document_extraction else '' }}: open-weight language model on {{ poss(platform.short) }} own server | {{ platform.city }}, {{ platform.country.en }} |
+{% endif %}
+| Platform services on {{ poss(platform.short) }} own infrastructure | {{ platform.city }}, {{ platform.country.en }} |
+
+{% if features.ai_assistant or features.document_extraction %}
+No personal data is sent to an external artificial intelligence provider.
+
+{% endif %}
+## Other services the platform contacts
+
+These services are not sub-processors. They receive only what is needed for the task
+described, without the user's name.
+
+| Service | What it receives | Why |
+|---|---|---|
+| {{ providers.maps.name }}, {{ providers.maps.country.en }} ({{ providers.maps.products.en }}) | The supply address, and the IP address of the browser that displays a map | Locating the supply address within the community's area; showing maps |
+| The push service of the user's browser (for example, Google, Mozilla or Apple) | An encrypted notification, which the push service cannot read | Delivering push notifications the user has allowed |
+
+## Changes
+
+The communities{{ ' and grid operators' if features.dso_data_exchange else '' }} that {{ platform.short }} serves are informed of a new or
+replaced sub-processor at least 30 days in advance. This list shows the current version
+and its date.

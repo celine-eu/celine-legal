@@ -1,0 +1,28 @@
+{#- EnergyForecasting: the readings are made available to the recipient, by the grid
+    operator directly or through the community, for the recipient's own research and
+    the training of forecasting models, as an independent controller. A trained model
+    is not retrained after withdrawal, and the text says so. `noun` and `plural` are how
+    an access offer this one requires names it. -#}
+{% import 'consent-texts/1.0/common.j2' as c with context %}
+{% set plural = true %}
+
+{% macro title(lang, offer, recipient) %}
+{{- 'Creazione di modelli di previsione dei consumi' if lang == 'it' else 'Building consumption forecasting models' -}}
+{% endmacro %}
+
+{% macro noun(lang) %}
+{{- 'la sua ricerca e i suoi modelli di previsione' if lang == 'it' else 'its research and forecasting models' -}}
+{% endmacro %}
+
+{% macro body(lang, offer, recipient) %}
+{% set role = c.role(lang, recipient) %}
+{% if lang == 'it' %}
+Autorizzo che le mie misure ({{ c.readings(lang, offer, 'brief') }}) siano rese disponibili a {{ c.name(recipient) }}, da {{ dso.short }} direttamente o tramite {{ rec.short }}. {{ recipient.short }} {% if role %}{{ role }} e, per questo scopo, {% endif %}le usa come titolare autonomo per la propria ricerca e per addestrare modelli di previsione dell'energia, compresi modelli di base («foundation model»).
+Attenzione: un modello già addestrato con i miei dati non viene riaddestrato dopo la revoca. Dopo la revoca i miei dati non sono più usati per nuovi addestramenti né per altre nuove elaborazioni.
+{{ c.optional(lang) }}.
+{% else %}
+I allow my readings ({{ c.readings(lang, offer, 'brief') }}) to be made available to {{ c.name(recipient) }}, by {{ dso.short }} directly or through {{ rec.short }}. {{ recipient.short }} {% if role %}{{ role }} and, for this purpose, {% endif %}uses them as an independent controller for its own research and to train energy forecasting models, including foundation models.
+Please note: a model already trained with my data is not retrained after I withdraw. After withdrawal my data is no longer used for new training or any other new processing.
+{{ c.optional(lang) }}.
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,318 @@
+---
+document: app-privacy-notice
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Privacy notice — {{ rec.short }} community platform
+
+**Information under Article 13 of Regulation (EU) 2016/679 (GDPR) — version {{ doc.version }}**
+
+This notice covers {{ rec.short }}'s digital platform:
+
+- the online membership application;
+- the community app, including its {% if features.ai_assistant %}AI assistant and its {% endif %}notifications;
+- the login service.
+
+{{ rec.short }}'s general privacy notice for members still applies to your membership
+itself.{% if features.dso_data_exchange %} The separate notice "Sharing your meter readings" covers the optional sharing of
+your meter readings.{% endif +%}
+
+## 1. Who is responsible
+
+The data controller is **{{ rec.name }}**.
+
+- Address: {{ rec.registered_office }}, {{ rec.country.en }}.
+- Tax code and VAT: {{ rec.tax_code }}.
+- PEC: {{ rec.pec }}.
+- Privacy contact: **{{ rec.privacy_contact }}**.
+- Data protection officer: {{ rec.dpo }}.
+
+{{ rec.short }} has entrusted the operation of the platform to **{{ platform.name }}**, {{ platform.registered_office }},
+which processes your data on {{ rec.short }}'s behalf and on its instructions (Article 28
+GDPR).
+
+## 2. What data, and why
+
+### 2.1 Your membership application
+
+**What we collect:**
+
+- your name and surname, tax code, email address and phone number;
+- the address and POD code of your supply point;
+- the information you give about your property and your energy equipment (solar panels,
+  battery, electric vehicle, heat pump);
+{% if features.document_extraction %}
+- your choices on the consent page;
+- if you choose to upload them, a copy of an electricity bill and of your identity
+  document.
+{% else %}
+- your choices on the consent page.
+{% endif %}
+
+**What we do with it:**
+
+{% if features.sms_verification %}
+- We verify your phone number with a one-time code sent by SMS.
+{% endif %}
+{% if features.document_extraction %}
+- If you upload a bill or an identity document, an artificial intelligence model reads
+  it and fills in the form for you. From the bill it reads only your name, tax code,
+  POD code, supply address and municipality. From the identity document it reads only
+  your name, tax code and the document's expiry date. You check and correct what it
+  read before you send the application. The model is an open-weight model on {{ platform.short }}'
+  own server in {{ platform.city }}, {{ platform.country.en }}. The documents are **not** sent to any external AI
+  provider and are **not** used to train AI models.
+- The copies you upload are stored encrypted, so that {{ rec.short }}'s staff can check the
+  application against them. They are deleted from the platform when your account is
+  activated. What remains is the record that {{ rec.short }} checked your identity, and
+  how.
+{% endif %}
+- We check your supply address against the areas of the community's configurations.
+  This decides which configuration you belong to.
+- Staff of {{ rec.short }} review the application. A person decides on admission.
+- {% filter wordwrap(85) | indent(2) %}
+If information you gave turns out to be wrong (for example, your POD code), {{ rec.short }} corrects it. It keeps a record of the previous value and of who made the correction.
+{%- endfilter +%}
+
+**Basis:**
+
+- the steps you ask for before joining (Article 6(1)(b) GDPR);
+- the legal requirements for renewable energy communities, Legislative Decree 199/2021
+  (Article 6(1)(c)).
+
+**Automatic area check:** if the check finds your address outside the community's
+areas, the application cannot continue. You can write to the privacy contact to have
+the check reviewed by a person.
+
+### 2.2 Your account
+
+**What we keep:**
+
+- your username, email address, name and preferred language;
+- the record of your logins.
+
+**Why:** to give you secure access to the platform.
+
+**Basis:**
+
+- the platform's terms of use (Article 6(1)(b));
+- for the login record, {{ rec.short }}'s legitimate interest in keeping the platform secure
+  (Article 6(1)(f)).
+
+### 2.3 The community app
+
+**What we use:**
+
+- the energy data of the meters and devices registered to you in the community;
+- forecasts and estimates derived from that data;
+- your responses to suggestions, your commitments and your points;
+- your app settings.
+
+**Why:**
+
+- to show you your consumption and production;
+- to show you forecasts, suggestions for shifting consumption, points and badges.
+
+**Basis:** your membership and the community rules (Article 6(1)(b)).
+
+**How suggestions and points are produced:** they are worked out automatically from
+your energy data.
+
+- They are suggestions only.
+- They have no legal effect on you.
+- They do not change what {{ rec.short }} pays you.
+
+**Leaderboards** show only your position, never your name.
+
+### 2.4 Notifications
+
+**What we use:**
+
+- your notification preferences;
+- your email address;
+- the technical address your browser gives us when you allow push notifications;
+- a record of which notifications were delivered, read and opened.
+
+**Why:** to send you notifications about your energy and the community. Notifications
+are selected by rules on your energy data, at most a few per day.
+
+**Your control:**
+
+- You can turn each kind of notification off in the app's settings.
+- Weather alerts cannot be turned off.
+
+**Basis:** the terms of use (Article 6(1)(b)).
+
+{% set skip = 0 if features.ai_assistant else 1 %}
+{% if features.ai_assistant %}
+### 2.5 The AI assistant
+
+**What we use:**
+
+- the messages you write;
+- the files you attach;
+- the answers produced;
+- the information the assistant reads for you to answer, with your own permissions:
+  your energy data, your membership, your commitments, and the weather.
+
+**What the assistant is:** an artificial intelligence system. Its answers can be wrong.
+
+**Where it runs:**
+
+- an open-weight language model on {{ platform.short }}' own server in {{ platform.city }}, {{ platform.country.en }};
+- your conversations are kept on the platform.
+
+**What happens to your conversations:**
+
+- They are **not** sent to any external AI provider.
+- They are **not** used to train AI models.
+
+**Basis:** the terms of use, for a feature you choose to use (Article 6(1)(b)).
+
+**Please do not** attach identity documents or other people's personal data.
+
+{% endif %}
+### 2.{{ 6 - skip }} Feedback
+
+**What we use:** when you send feedback, your rating and comment, together with
+technical details:
+
+- the page;
+- your browser and screen size;
+- your IP address;
+- **a screenshot of the page you were on**.
+
+**Basis:** {{ rec.short }}'s legitimate interest in improving the platform (Article 6(1)(f)).
+
+Sending feedback is voluntary. Check what is on screen before you send it.
+
+### 2.{{ 7 - skip }} Records of what you accepted and chose
+
+**What we keep:**
+
+- which version of each document you accepted or read, and when;
+- the IP address you did it from;
+- each consent you gave or withdrew, with the text you were shown.
+
+**Basis:** {{ rec.short }}'s obligation to be able to demonstrate them (Articles 5(2) and
+7(1) GDPR; Article 6(1)(c)).
+
+### 2.{{ 8 - skip }} Updates from {{ rec.short }}
+
+If you asked to be kept updated, we use your email address to send you news about the
+community.
+
+**Basis:** your consent (Article 6(1)(a)). You can withdraw it at any time, through the
+link in each message or by writing to the privacy contact.
+
+## 3. Is providing the data required?
+
+The data in §2.1 and §2.2 is needed to apply for membership and to use the platform.
+{% if features.document_extraction %}
+Uploading a bill or an identity document is not: you can type the same information
+yourself. Everything else is up to you as well:
+{% else %}
+Everything else is up to you:
+{% endif %}
+
+- notifications;
+{% if features.ai_assistant %}
+- the assistant;
+{% endif %}
+- feedback;
+- updates.
+
+## 4. Who receives your data
+
+- **{{ platform.short }}** operates the platform for {{ rec.short }}, as processor.
+- **{{ platform.short }}' sub-processors**, listed in the platform's sub-processor list:
+  - {{ providers.hosting.name }}, for hosting in the European Union;
+  - an email delivery provider {{ providers.email.name }};
+{% if features.sms_verification %}
+  - {{ providers.sms.name }}, {{ providers.sms.country.en }}, for verification SMS.
+{% endif %}
+- **{{ providers.maps.name }}**: receives your supply address to locate it on the map,
+  without your name.
+- **{{ rec.short }}'s staff**, as far as their role requires:
+  - the members list shows community managers your name, your meters and your
+    consumption aggregates.
+- **GSE**, and the other recipients listed in {{ rec.short }}'s general privacy notice for
+  members, for the management of the community.
+
+Your data is not published and not sold.
+
+## 5. Where your data is processed
+
+The platform runs on {{ providers.hosting.brand }} in the European Union, and on {{ platform.short }}' own
+infrastructure in {{ platform.city }}, {{ platform.country.en }}. Your data is processed in the European Economic
+Area.
+
+The {{ providers.maps.name }} is based in the {{ providers.maps.country.en }}. The {{ providers.maps.country.en }} is
+covered by a European Commission adequacy decision.
+
+## 6. How long we keep it
+
+| Data | Kept for |
+|---|---|
+| Application that is not accepted, or withdrawn | 12 months from the decision |
+| Application of an admitted member, account, app data | For the duration of membership, then as in {{ rec.short }}'s general privacy notice for members (5 years from the end of membership) |
+{% if features.document_extraction %}
+| Copies of the bill and identity document uploaded with the application | Until your account is activated. For an application that is not accepted, as the application |
+{% endif %}
+{% if features.sms_verification %}
+| SMS verification codes | 24 hours |
+{% endif %}
+| Login and security records | 12 months |
+| Notifications and their delivery records | 12 months |
+{% if features.ai_assistant %}
+| AI assistant conversations and attachments | Until you delete them, and at most 12 months after the last message |
+{% endif %}
+| Feedback, including screenshots | 12 months |
+| Records of acceptances and consents | For the duration of membership and 5 years after it ends, or after the consent is withdrawn |
+| Address for updates | Until you withdraw consent |
+
+## 7. Cookies and local storage
+
+The platform uses only what it needs to work:
+
+- a **session cookie** that keeps you logged in, removed when you log out or when the
+  session expires;
+- your browser's **local storage**, for your language and light or dark theme.
+
+There are no analytics, advertising or profiling cookies, so no cookie consent is
+asked.
+
+## 8. Your rights
+
+You can ask {{ rec.short }} for:
+
+- access to your data;
+- its rectification or erasure;
+- restriction of processing;
+- portability of the data you provided.
+
+You can also object to processing based on legitimate interest (Articles 15–22 GDPR).
+
+**How to ask:** write to **{{ rec.privacy_contact }}**. You will receive an
+answer within one month.
+
+**In the app** you can yourself:
+
+{% if features.ai_assistant %}
+- delete your assistant conversations and attachments;
+{% endif %}
+- change your notification settings{{ ';' if features.dso_data_exchange else '.' }}
+{% if features.dso_data_exchange %}
+- change your data-sharing choices.
+{% endif %}
+
+You can also lodge a complaint with the Garante per la protezione dei dati personali,
+Piazza Venezia 11, 00187 Roma, www.garanteprivacy.it.
+
+## 9. Changes
+
+When this notice changes, the platform shows you the new version at your next login.
+The version and date are at the top of this notice.
