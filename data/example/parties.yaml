@@ -91,6 +91,11 @@ providers:
     sub_processor: true
     service: {it: "Codici via SMS", en: "SMS codes"}
     region: eu
+    # What may leave the EEA, and under which safeguard: listed in the DPA's Annex 3, the
+    # sub-processor list and the privacy notice. Leave it out when nothing does.
+    transfers:
+      it: "accesso del supporto tecnico da fuori dello SEE, con le clausole contrattuali tipo della Commissione europea"
+      en: "support access from outside the EEA, under the European Commission's standard contractual clauses"
     dpa_service:
       rec: {en: "SMS codes"}
   maps:

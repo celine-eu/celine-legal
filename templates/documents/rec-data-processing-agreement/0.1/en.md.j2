@@ -101,9 +101,14 @@ The Controller gives general authorisation for the sub-processors in Annex 3.
 the same data-protection obligations as in this agreement. It remains fully liable to
 the Controller for each sub-processor's performance.
 
+{% set xfer = namespace(items=[]) %}{% for key, p in providers.items() if (key != 'sms' or features.sms_verification) and p.sub_processor is defined and p.sub_processor and p.dpa_service is defined and p.dpa_service.rec is defined and p.transfers is defined %}{% set xfer.items = xfer.items + [p] %}{% endfor %}
 ## 8. Location
 
+{% if xfer.items %}
+The personal data is stored and processed in the European Economic Area:
+{% else %}
 The personal data is processed in the European Economic Area only:
+{% endif %}
 
 - on {{ providers.hosting.brand }} infrastructure in the European Union;
 - on the Processor's own infrastructure in {{ platform.city }}, {{ platform.country.en }}.
@@ -123,8 +128,17 @@ application runs on the Processor's own server in {{ platform.city }}. No person
 sent to an AI provider outside this agreement.
 
 {% endif %}
+{% if xfer.items %}
+The sub-processors in Annex 3 whose entry states a transfer may access the personal data
+from outside the European Economic Area, only as stated there and under the safeguard it
+names (Chapter V GDPR). By agreeing Annex 3, the Controller instructs those transfers.
+
+No other transfer outside the European Economic Area takes place without the Controller's
+prior written instruction and a transfer mechanism under Chapter V GDPR.
+{% else %}
 No transfer outside the European Economic Area takes place without the Controller's
 prior written instruction and a transfer mechanism under Chapter V GDPR.
+{% endif %}
 
 ## 9. Assistance
 
@@ -246,10 +260,15 @@ jurisdiction.
 
 ## Annex 3 — Authorised sub-processors
 
+{% if xfer.items %}
+| Sub-processor | Service | Location | Transfers outside the EEA |
+|---|---|---|---|
+{% else %}
 | Sub-processor | Service | Location |
 |---|---|---|
+{% endif %}
 {% for key, p in providers.items() if (key != 'sms' or features.sms_verification) and p.sub_processor is defined and p.sub_processor and p.dpa_service is defined and p.dpa_service.rec is defined %}
-| {{ p.name }}{% if p.address is defined %}, {{ p.address }}{% endif %} | {{ p.dpa_service.rec.en }} | {{ region(p) }} |
+| {{ p.name }}{% if p.address is defined %}, {{ p.address }}{% endif %} | {{ p.dpa_service.rec.en }} | {{ region(p) }} |{% if xfer.items %} {{ p.transfers.en if p.transfers is defined else 'None' }} |{% endif +%}
 {% endfor %}
 
 ## Signatures

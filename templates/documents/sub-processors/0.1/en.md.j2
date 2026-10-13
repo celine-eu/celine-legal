@@ -23,15 +23,21 @@ This list names
 the providers that {{ platform.short }} uses for that service, and the other services the
 platform contacts.
 
+{% set xfer = namespace(items=[]) %}{% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and p.transfers is defined and (key != 'sms' or features.sms_verification) %}{% set xfer.items = xfer.items + [p] %}{% endfor %}
 ## Sub-processors
 
 These providers process personal data for {{ platform.short }}, under a contract with the same
 data-protection obligations as {{ poss(platform.short) }} own.
 
+{% if xfer.items %}
+| Provider | Service | Where | Transfers outside the EEA |
+|---|---|---|---|
+{% else %}
 | Provider | Service | Where |
 |---|---|---|
+{% endif %}
 {% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and (key != 'sms' or features.sms_verification) %}
-| {{ p.name }}{% if p.city is defined %}, {{ p.city[doc.lang] }}, {{ p.country[doc.lang] }}{% endif %} | {{ p.service[doc.lang] }} | {{ region(p) }} |
+| {{ p.name }}{% if p.city is defined %}, {{ p.city[doc.lang] }}, {{ p.country[doc.lang] }}{% endif %} | {{ p.service[doc.lang] }} | {{ region(p) }} |{% if xfer.items %} {{ p.transfers[doc.lang] if p.transfers is defined else 'None' }} |{% endif +%}
 {% endfor %}
 
 ## {{ poss(platform.short) }} own infrastructure

@@ -43,6 +43,12 @@ MARKERS: dict[str, dict[tuple[str, str], list[str]]] = {
                                                           "copies of an electricity bill",
                                                           "uploaded documents are encrypted per file"],
     },
+    "existing_members": {
+        ("example-rec/app-privacy-notice", "en"): ["already a member of Example REC", "member register",
+                                                   "the register's address decides the area"],
+        ("example-rec/app-privacy-notice", "it"): ["già socio di Example REC", "libro dei soci",
+                                                   "l'area è decisa dall'indirizzo del libro dei soci"],
+    },
     "ai_assistant": {
         ("example-rec/app-privacy-notice", "en"): ["### 2.5 The AI assistant", "assistant conversations"],
         ("example-rec/app-privacy-notice", "it"): ["### 2.5 L'assistente AI", "assistente AI"],
@@ -209,3 +215,52 @@ def test_the_stable_site_announces_only_what_can_exist_here():
     current = {f.path: json.loads(f.text) for f in files if f.path.endswith("current.json")}
     assert current["example-rec/current.json"]["pending"] == ["privacy", "terms"]
     assert current["platform/current.json"]["pending"] == ["sub_processors"]
+
+
+TRANSFERS = {
+    ("example-rec/app-privacy-notice", "en"): ["may access your data from outside the European Economic",
+                                               "Example SMS SAS: support access from outside the EEA"],
+    ("example-rec/app-privacy-notice", "it"): ["possono accedere ai tuoi dati da fuori dello Spazio",
+                                               "Example SMS SAS: accesso del supporto tecnico"],
+    ("platform/sub-processors", "en"): ["| Transfers outside the EEA |", "| European Union | None |"],
+    ("platform/sub-processors", "it"): ["| Trasferimenti fuori dallo SEE |", "| Unione europea | Nessuno |"],
+    ("example-rec/data-processing-agreement", "en"): ["stored and processed in the European Economic Area:",
+                                                      "the Controller instructs those transfers",
+                                                      "No other transfer outside", "| Transfers outside the EEA |"],
+}
+
+
+def test_a_sub_processors_transfers_are_stated_wherever_it_is_listed():
+    on = _all_on()
+    for key, phrases in TRANSFERS.items():
+        for phrase in phrases:
+            assert phrase in on[key], (key, phrase)
+
+
+def _without_transfers(tmp_path) -> Path:
+    data = tmp_path / "data"
+    shutil.copytree(EXAMPLE, data)
+    parties = yaml.safe_load((data / "parties.yaml").read_text())
+    for p in parties["providers"].values():
+        p.pop("transfers", None)
+    (data / "parties.yaml").write_text(yaml.safe_dump(parties, allow_unicode=True, sort_keys=False))
+    return data
+
+
+def test_with_no_transfers_the_texts_say_the_eea_only(tmp_path):
+    texts = _texts(_without_transfers(tmp_path))
+    for key, phrases in TRANSFERS.items():
+        for phrase in phrases:
+            assert phrase not in texts[key], (key, phrase)
+    assert "processed in the European Economic Area only:" in texts[("example-rec/data-processing-agreement", "en")]
+    assert "| Provider | Service | Where |\n" in texts[("platform/sub-processors", "en")]
+
+
+def test_a_transfer_goes_with_its_provider(tmp_path):
+    """Without SMS, the SMS provider's transfer is not stated either."""
+    texts = _texts(off=("sms_verification",))
+    for key, phrases in TRANSFERS.items():
+        for phrase in phrases:
+            assert phrase not in texts[key], (key, phrase)
+    # and the texts read exactly as with no provider stating one
+    assert texts == _texts(_without_transfers(tmp_path), off=("sms_verification",))

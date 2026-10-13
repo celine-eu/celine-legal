@@ -75,6 +75,11 @@ del trattamento (art. 28 GDPR).
   attivato. Resta la registrazione del fatto che {{ rec.short }} ha verificato la tua
   identità, e di come lo ha fatto.
 {% endif %}
+{% if features.existing_members %}
+- {% filter wordwrap(85) | indent(2) %}
+Se dichiari di essere già socio di {{ rec.short }}, la domanda può saltare alcuni passaggi. Il personale di {{ rec.short }} completa allora il codice POD, e se serve l'indirizzo di fornitura, dal libro dei soci della comunità: i dati che hai fornito a {{ rec.short }} quando ti sei associato. Se non ti trova nel libro dei soci, la domanda è respinta e sei invitato a presentarla come nuovo socio.
+{%- endfilter +%}
+{% endif %}
 - Controlliamo l'indirizzo di fornitura rispetto alle aree delle configurazioni della
   comunità, per stabilire a quale configurazione appartieni.
 - La domanda è esaminata dal personale di {{ rec.short }}. L'ammissione è decisa da una
@@ -90,6 +95,11 @@ del trattamento (art. 28 GDPR).
 **Controllo automatico dell'area:** se dal controllo l'indirizzo risulta fuori dalle aree
 della comunità, la domanda non può proseguire. Puoi scrivere al contatto privacy per far
 riesaminare il controllo da una persona.
+{% if features.existing_members %}
+
+Se il personale completa l'indirizzo di fornitura dal libro dei soci, non c'è alcun
+rifiuto automatico: l'area è decisa dall'indirizzo del libro dei soci.
+{% endif %}
 
 ### 2.2 Il tuo account
 
@@ -254,11 +264,23 @@ Il resto dipende da te:
 
 I tuoi dati non sono diffusi né venduti.
 
+{% set xfer = namespace(items=[]) %}{% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and p.transfers is defined and (key != 'sms' or features.sms_verification) %}{% set xfer.items = xfer.items + [p] %}{% endfor %}
 ## 5. Dove sono trattati i tuoi dati
 
 La piattaforma funziona su {{ providers.hosting.brand }} nell'Unione europea e sull'infrastruttura
 propria di {{ platform.short }} a {{ platform.city }}. I tuoi dati sono trattati nello
 Spazio economico europeo.
+{% if xfer.items %}
+
+Alcuni sub-responsabili indicati al §4 possono accedere ai tuoi dati da fuori dello Spazio
+economico europeo, solo come segue:
+
+{% for p in xfer.items %}
+- {% filter wordwrap(85) | indent(2) %}
+{{ p.name }}: {{ p.transfers.it }}.
+{%- endfilter +%}
+{% endfor %}
+{% endif %}
 
 La {{ providers.maps.name }} ha sede nel {{ providers.maps.country.it }}. Il {{ providers.maps.country.it }} è coperto da una
 decisione di adeguatezza della Commissione europea.

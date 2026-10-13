@@ -23,15 +23,21 @@ digitale. Questo
 elenco indica i fornitori di cui {{ platform.short }} si avvale per questo servizio e gli altri
 servizi che la piattaforma contatta.
 
+{% set xfer = namespace(items=[]) %}{% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and p.transfers is defined and (key != 'sms' or features.sms_verification) %}{% set xfer.items = xfer.items + [p] %}{% endfor %}
 ## Sub-responsabili
 
 Questi fornitori trattano dati personali per conto di {{ platform.short }}. Lo fanno in base a un
 contratto con gli stessi obblighi di protezione dei dati di {{ platform.short }}.
 
+{% if xfer.items %}
+| Fornitore | Servizio | Dove | Trasferimenti fuori dallo SEE |
+|---|---|---|---|
+{% else %}
 | Fornitore | Servizio | Dove |
 |---|---|---|
+{% endif %}
 {% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and (key != 'sms' or features.sms_verification) %}
-| {{ p.name }}{% if p.city is defined %}, {{ p.city[doc.lang] }}, {{ p.country[doc.lang] }}{% endif %} | {{ p.service[doc.lang] }} | {{ region(p) }} |
+| {{ p.name }}{% if p.city is defined %}, {{ p.city[doc.lang] }}, {{ p.country[doc.lang] }}{% endif %} | {{ p.service[doc.lang] }} | {{ region(p) }} |{% if xfer.items %} {{ p.transfers[doc.lang] if p.transfers is defined else 'Nessuno' }} |{% endif +%}
 {% endfor %}
 
 ## Infrastruttura propria di {{ platform.short }}

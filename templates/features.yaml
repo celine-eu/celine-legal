@@ -23,6 +23,16 @@ features:
       fills in the application
     mirrors: onboarding document_processing_enabled (EXTRACTION_ENABLED with LLM_BASE_URL and LLM_VISION_MODEL); upload follows it
 
+  existing_members:
+    description: >-
+      an applicant may declare they are already a member of the community; staff then
+      complete the POD code, and the supply address where the template defers it, from the
+      community's member register
+    mirrors: >-
+      onboarding template existing_members.enabled (REQ-0024). Per template, while this is per
+      deployment: on if any community's template enables it, and then described for every
+      community the deployment renders
+
   ai_assistant:
     description: the community app has an AI assistant
     mirrors: no switch yet; on wherever the ai-assistant release is installed and the app links it

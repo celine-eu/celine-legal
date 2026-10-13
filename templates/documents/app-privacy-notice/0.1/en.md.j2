@@ -70,6 +70,11 @@ GDPR).
   activated. What remains is the record that {{ rec.short }} checked your identity, and
   how.
 {% endif %}
+{% if features.existing_members %}
+- {% filter wordwrap(85) | indent(2) %}
+If you declare that you are already a member of {{ rec.short }}, the application may skip some of its steps for you. {{ rec.short }}'s staff then complete your POD code, and where needed your supply address, from the community's member register: the data you gave {{ rec.short }} when you joined. If they do not find you in the register, the application is rejected and you are invited to apply as a new member.
+{%- endfilter +%}
+{% endif %}
 - We check your supply address against the areas of the community's configurations.
   This decides which configuration you belong to.
 - Staff of {{ rec.short }} review the application. A person decides on admission.
@@ -86,6 +91,11 @@ If information you gave turns out to be wrong (for example, your POD code), {{ r
 **Automatic area check:** if the check finds your address outside the community's
 areas, the application cannot continue. You can write to the privacy contact to have
 the check reviewed by a person.
+{% if features.existing_members %}
+
+Where staff complete your supply address from the member register, there is no automatic
+refusal: the register's address decides the area.
+{% endif %}
 
 ### 2.2 Your account
 
@@ -244,11 +254,23 @@ Everything else is up to you:
 
 Your data is not published and not sold.
 
+{% set xfer = namespace(items=[]) %}{% for key, p in providers.items() if p.sub_processor is defined and p.sub_processor and p.transfers is defined and (key != 'sms' or features.sms_verification) %}{% set xfer.items = xfer.items + [p] %}{% endfor %}
 ## 5. Where your data is processed
 
 The platform runs on {{ providers.hosting.brand }} in the European Union, and on {{ platform.short }}' own
 infrastructure in {{ platform.city }}, {{ platform.country.en }}. Your data is processed in the European Economic
 Area.
+{% if xfer.items %}
+
+Some sub-processors listed in §4 may access your data from outside the European Economic
+Area, only as follows:
+
+{% for p in xfer.items %}
+- {% filter wordwrap(85) | indent(2) %}
+{{ p.name }}: {{ p.transfers.en }}.
+{%- endfilter +%}
+{% endfor %}
+{% endif %}
 
 The {{ providers.maps.name }} is based in the {{ providers.maps.country.en }}. The {{ providers.maps.country.en }} is
 covered by a European Commission adequacy decision.

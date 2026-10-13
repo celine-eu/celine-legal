@@ -5,6 +5,7 @@
 features:
   sms_verification: true
   document_extraction: true
+  existing_members: true
   ai_assistant: true
   dso_data_exchange: true
 

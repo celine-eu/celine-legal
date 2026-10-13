@@ -398,7 +398,7 @@ def test_publishing_what_was_approved_records_how_it_was_made(tmp_path, capsys):
     assert record["release"] == "v0.1.0" and record["revision"] == "f" * 40
     assert record["template"] == "terms-of-use/0.1" and record["renderer"].startswith("celine-legal ")
     assert record["features"] == {"ai_assistant": True, "document_extraction": True, "dso_data_exchange": True,
-                                  "sms_verification": True}
+                                  "existing_members": True, "sms_verification": True}
     assert legal_build.releases(docs) == ["v0.1.0"]
 
 
