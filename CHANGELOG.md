@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v0.2.0 (2026-10-13)
+
+### Bug Fixes
+
+- Review release and workflow
+  ([`a9e6e07`](https://github.com/celine-eu/celine-legal/commit/a9e6e07f262de78f422a5d2ca1941b6eb4fa5f36))
+
+### Chores
+
+- Fix sv templates path
+  ([`b4562cd`](https://github.com/celine-eu/celine-legal/commit/b4562cd5b2b6664e442556afee4583de9b73fb8c))
+
+### Features
+
+- Add sms handling
+  ([`a9cde09`](https://github.com/celine-eu/celine-legal/commit/a9cde095541835cd5d1f330f143b29235d52b519))
+
+
 ## v0.2.0: notes
 
 The changes released in v0.2.0, in detail (the section above is generated from the commits).
