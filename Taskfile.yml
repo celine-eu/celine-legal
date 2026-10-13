@@ -48,56 +48,12 @@ tasks:
         curl -fsS "http://127.0.0.1:$port/example-rec/current.json" | grep -q '"pending"'
         echo "  ok {{.IMAGE}}:local serves the example: the draft at /draft/$rev/, nothing stable yet at /"
 
-  # **Releasing** (the maintainer commits, tags and pushes; these tasks never push):
-  #   task release:version VERSION=0.2.0   set the version (pyproject, lock); add its CHANGELOG section
-  #   task release:check VERSION=0.2.0     everything a release needs, before committing it
-  #   git commit -am "0.2.0"
-  #   task release:tag VERSION=0.2.0       the annotated tag v0.2.0, after the check passes on a clean tree
-  #   git push origin main v0.2.0          GitHub Actions (release.yaml) tests, builds, smoke-tests and
-  #                                        pushes ghcr.io/celine-eu/celine-legal:v0.2.0 and :latest
-  release:version:
-    desc: Set the project version to VERSION (pyproject.toml and uv.lock)
-    requires:
-      vars: [VERSION]
-    preconditions:
-      - sh: echo "{{.VERSION}}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
-        msg: "VERSION={{.VERSION}}: X.Y.Z, without the v"
+  release:
+    desc: Create a semantic release
     cmds:
-      - sed -i -E 's/^version = "[^"]+"/version = "{{.VERSION}}"/' pyproject.toml
-      - uv lock --quiet
-      - 'grep -q "^## {{.VERSION}}$" CHANGELOG.md || echo "  !! add a ## {{.VERSION}} section to CHANGELOG.md"'
-
-  release:check:
-    desc: Is VERSION ready to release? Version, changelog, tests, private names, image smoke test
-    requires:
-      vars: [VERSION]
-    preconditions:
-      - sh: grep -q '^version = "{{.VERSION}}"$' pyproject.toml
-        msg: "pyproject.toml is not at {{.VERSION}}: task release:version VERSION={{.VERSION}}"
-      - sh: grep -q "^## {{.VERSION}}$" CHANGELOG.md
-        msg: "CHANGELOG.md has no ## {{.VERSION}} section"
-      - sh: '! git rev-parse -q --verify "refs/tags/v{{.VERSION}}" >/dev/null'
-        msg: "v{{.VERSION}} is already tagged"
-    cmds:
-      - task: test
-      - task: check:private-names
-      - task: image
-      - echo "  ok {{.VERSION}} is ready; commit it, then task release:tag VERSION={{.VERSION}}"
-
-  release:tag:
-    desc: Tag the committed VERSION as vVERSION (annotated); prints the push command, never pushes
-    requires:
-      vars: [VERSION]
-    preconditions:
-      - sh: '[ -z "$(git status --porcelain)" ]'
-        msg: "uncommitted changes: commit the release first"
-      - sh: grep -q '^version = "{{.VERSION}}"$' pyproject.toml
-        msg: "the committed pyproject.toml is not at {{.VERSION}}"
-    cmds:
-      - task: release:check
-        vars: { VERSION: '{{.VERSION}}' }
-      - git tag -a "v{{.VERSION}}" -m "celine-legal {{.VERSION}}"
-      - 'echo "  tagged v{{.VERSION}}; publish it with: git push origin HEAD v{{.VERSION}}"'
+      - uv run semantic-release -v version --no-vcs-release
+      - git push
+      - git push --tags
 
   check:private-names:
     desc: No tracked file names a private organisation (list in .private-names or $LEGAL_PRIVATE_NAMES)

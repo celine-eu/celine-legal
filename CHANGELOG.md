@@ -1,9 +1,10 @@
-# Changelog
+# CHANGELOG
 
-Versions are released as git tags `vX.Y.Z`; each tag publishes the image
-`ghcr.io/celine-eu/celine-legal:vX.Y.Z` (and `:latest`).
+<!-- version list -->
 
-## Unreleased
+## v0.2.0: notes
+
+The changes released in v0.2.0, in detail (the section above is generated from the commits).
 
 - Feature `existing_members`: the privacy notice describes the applicant's declaration that
   they are already a member, and the community's member register as the source of the POD
@@ -16,7 +17,7 @@ Versions are released as git tags `vX.Y.Z`; each tag publishes the image
   Annex 3), the sub-processor list and the privacy notice (§5) state it. Where none does,
   the texts are unchanged.
 
-## 0.1.0
+## v0.1.0
 
 First release.
 

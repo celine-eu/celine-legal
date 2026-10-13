@@ -22,6 +22,7 @@ dev = [
     "pytest>=8.3",
     # FastAPI's test client.
     "httpx>=0.28",
+    "python-semantic-release>=10.5.3",
 ]
 
 [build-system]
@@ -34,6 +35,32 @@ packages = ["src/celine"]
 # The templates ship inside the package, where `celine.legal.build` looks first.
 [tool.hatch.build.targets.wheel.force-include]
 "templates" = "celine/legal/templates"
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+
+build_command = """
+    uv lock --upgrade-package "$PACKAGE_NAME"
+    git add uv.lock
+    uv build
+"""
+
+branch = "main"
+changelog_file = "CHANGELOG.md"
+tag_format = "v{version}"
+allow_zero_version = true
+major_on_zero = false
+commit_parser = "conventional"
+
+upload_to_release = false
+upload_to_pypi = false
+commit_version_number = false
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf", "up"]
+parse_squash_commits = true
+ignore_merge_commits = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

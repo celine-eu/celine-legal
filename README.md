@@ -190,9 +190,7 @@ The draft does not render, and its address says why:
 | `task render MODE=sample\|final [DATA=…]` | the draft or the stable site laid out into `build/<MODE>/`, with what it refused or left out |
 | `task image` | builds the image as CI does and smoke-tests it on the example |
 | `task check:private-names` | no tracked file names a private organisation (below) |
-| `task release:version VERSION=X.Y.Z` | sets the version in `pyproject.toml` and `uv.lock` |
-| `task release:check VERSION=X.Y.Z` | version, changelog, tests, private names, image: ready to release? |
-| `task release:tag VERSION=X.Y.Z` | on a clean, committed tree: the check, then the annotated tag `vX.Y.Z` |
+| `task release` | a semantic release from the conventional commits since the last tag, pushed (below) |
 
 `check:private-names` reads the names that must never appear here from a file outside git
 (`.private-names`, ignored, or `$LEGAL_PRIVATE_NAMES`); CI reads the repository secret
@@ -202,21 +200,21 @@ a template.
 ## Releasing
 
 ```sh
-task release:version VERSION=0.2.0       # then add "## 0.2.0" to CHANGELOG.md
-task release:check VERSION=0.2.0
-git commit -am "0.2.0"
-task release:tag VERSION=0.2.0           # tags v0.2.0; never pushes
-git push origin HEAD v0.2.0
+task release
 ```
 
-The tasks never commit or push; the push starts the release.
+As in the other CELINE services, [python-semantic-release](https://python-semantic-release.readthedocs.io/)
+reads the conventional commits since the last tag (`feat:` a minor, `fix:`/`perf:`/`up:` a
+patch, `BREAKING CHANGE` a major, a minor while on 0.x), sets the version in `pyproject.toml` and `uv.lock`, adds
+its section to `CHANGELOG.md`, commits, tags `vX.Y.Z` and pushes; the pushed tag starts the
+release workflow.
 
 **GitHub workflows** (`.github/workflows/`):
 
 | Workflow | Runs on | Does |
 |---|---|---|
 | `ci.yaml` | every pull request, every push to `main` | the tests; the example laid out as a draft and as a stable site; the private-name check (with the `LEGAL_PRIVATE_NAMES` secret, skipped without) |
-| `release.yaml` | a push to `main`, a tag | the tests; on a tag, checks the tag is `v` + the project's version and the changelog has it; builds the image, smoke-tests it (no data refused; the draft and the stable site answer), pushes `ghcr.io/celine-eu/celine-legal:<tag>` and `:latest` (a tag) or `:dev` (`main`) |
+| `release.yaml` | a push to `main`, a tag | the tests; on a tag, checks the tag is `v` + the project's version; builds the image, smoke-tests it (no data refused; the draft and the stable site answer), pushes `ghcr.io/celine-eu/celine-legal:<tag>` and `:latest` (a tag) or `:dev` (`main`) |
 
 A deployment pins a released tag (`vX.Y.Z`), never `latest` or `dev`.
 

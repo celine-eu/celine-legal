@@ -25,7 +25,6 @@ jobs:
         run: |
           version=$(sed -n -E 's/^version = "([^"]+)"/\1/p' pyproject.toml)
           [ "${GITHUB_REF#refs/tags/}" = "v$version" ] || { echo "tag ${GITHUB_REF#refs/tags/} is not v$version"; exit 1; }
-          grep -q "^## $version$" CHANGELOG.md || { echo "CHANGELOG.md has no ## $version"; exit 1; }
 
   # One generic image: `dev` from main, `<tag>` and `latest` from a tag. A deployment's data
   # is mounted at run time, never built in.
