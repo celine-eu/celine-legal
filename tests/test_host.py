@@ -282,6 +282,34 @@ def test_a_draft_answers_only_under_its_commit(sample):
 
 def test_without_a_revision_there_is_no_draft(final):
     assert final.get(f"{DRAFT}/").status_code == 404
+    assert final.get("/draft/latest/").status_code == 404  # no draft, no alias
+
+
+def test_the_alias_redirects_to_the_current_draft(sample):
+    """A reviewer's link survives the next commit; the page it lands on names the revision."""
+    outside = TestClient(sample.app, follow_redirects=False)
+    for path, target in [("/draft/latest", f"{DRAFT}/"), ("/draft/latest/", f"{DRAFT}/"),
+                         ("/draft/latest/terms/example-rec?lang=en", f"{DRAFT}/terms/example-rec?lang=en")]:
+        response = outside.get(path)
+        assert response.status_code == 302, path
+        assert response.headers["location"] == target and response.headers["cache-control"] == "no-store"
+    assert outside.get("/draft/latestx/").status_code == 404
+
+
+def test_a_deployment_names_its_own_alias_or_none(tmp_path):
+    env = {"LEGAL_DATA": str(EXAMPLE), "LEGAL_REVISION": REVISION}
+    own = TestClient(create_app({**env, "LEGAL_DRAFT_ALIAS": "review-7f3a"}), follow_redirects=False)
+    assert own.get("/draft/review-7f3a/privacy").headers["location"] == f"{DRAFT}/privacy"
+    assert own.get("/draft/latest/").status_code == 404  # the default is gone with it
+    none = TestClient(create_app({**env, "LEGAL_DRAFT_ALIAS": ""}), follow_redirects=False)
+    assert none.get("/draft/latest/").status_code == 404
+    assert none.get(f"{DRAFT}/").status_code == 200
+
+
+@pytest.mark.parametrize("alias", ["a/b", "../x", ".hidden", "with space", "f" * 40])
+def test_an_alias_is_one_segment_and_never_a_commit(alias):
+    with pytest.raises(SystemExit, match="LEGAL_DRAFT_ALIAS"):
+        create_app({"LEGAL_DATA": str(EXAMPLE), "LEGAL_REVISION": REVISION, "LEGAL_DRAFT_ALIAS": alias})
 
 
 def test_a_draft_keeps_its_readers_inside_it(sample):

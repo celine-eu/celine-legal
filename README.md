@@ -54,6 +54,7 @@ with a read-only root filesystem.
 |---|---|
 | `LEGAL_DATA` | the deployment's data directory (image default `/data`) |
 | `LEGAL_REVISION` | the full 40-hex commit of the data: serves the draft at `/draft/<commit>/`. Unset, no draft |
+| `LEGAL_DRAFT_ALIAS` | the stable name `/draft/<alias>/` redirects from to the current draft; default `latest`, empty for none. Anyone can guess the default: set your own when the draft is private (below) |
 | `LEGAL_RELEASE` | `vX.Y.Z`: pins the stable site to that release; the host refuses to start if it is not the newest published |
 | `LEGAL_OFFERS` | the sharing offers members consent to; default `$LEGAL_DATA/sharing-offers.yaml` |
 | `LEGAL_TEMPLATES` | the document templates; default the packaged ones |
@@ -65,7 +66,7 @@ One host serves two sites that never meet.
 
 | | the stable site | the draft |
 |---|---|---|
-| served at | the root | `/draft/<commit>/` only; any other `/draft/…` is a bare 404 |
+| served at | the root | `/draft/<commit>/` only, and `/draft/<alias>/` redirects there; any other `/draft/…` is a bare 404 |
 | what it serves | the published editions only, as frozen; per slot the newest published version | the data as it is now, rendered: drafts included, every document for review (`/catalogue`), agreements for signature included |
 | a slot with nothing published | a page: *Document not yet available*; not in `current.json` (`pending`) | the draft text |
 | every page | the release | a banner: *SAMPLE — texts under review, not valid*, and the commit |
@@ -82,7 +83,14 @@ nobody approved. Until a first release, every slot is "not yet available".
 **The draft's link is its access.** The commit of a private data repository cannot be
 guessed, so the parties reviewing a draft get its link and nobody else finds it. The link
 also names exactly what they reviewed: a new commit is a new draft at a new address. Pages
-are never indexed. A draft that needs more than that sits behind the ingress's own
+are never indexed.
+
+**The alias is a link that survives the next commit.** `/draft/<alias>/…` redirects to the
+same page of the current draft, so reviewers keep one bookmark; the page they land on still
+names the commit, and what they approve is still that text. The default alias, `latest`,
+is guessable: with it, anyone can reach a draft that the commit kept private. A deployment
+whose draft is private sets `LEGAL_DRAFT_ALIAS` to a name of its own (one path segment,
+never 40-hex), or to empty for none. A draft that needs more than that sits behind the ingress's own
 authentication.
 
 **From draft to release:**

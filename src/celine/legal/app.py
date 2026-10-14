@@ -13,12 +13,16 @@ It serves two sites that never meet:
   now, rendered for the parties to review, marked on every page as not valid. Its link is
   the access, and names exactly what was reviewed. Nothing outside that prefix links to it,
   and a draft that does not render answers so under its own prefix only: the stable site
-  keeps serving.
+  keeps serving. ``/draft/<alias>/`` redirects to the current draft, so a reviewer's link
+  survives the next commit; the page it lands on still names the revision.
 
 Configuration, all from the environment:
 
     LEGAL_DATA          required: the deployment's data directory
     LEGAL_REVISION      the full 40-hex commit of the data: serves the draft at /draft/<revision>/
+    LEGAL_DRAFT_ALIAS   the stable name that redirects to the current draft; default ``latest``,
+                        empty for none. Anyone can guess the default: a deployment whose draft
+                        is private sets its own
     LEGAL_RELEASE       vX.Y.Z: pins the release the stable site must be (the newest published)
     LEGAL_OFFERS        the sharing offers; default ``$LEGAL_DATA/sharing-offers.yaml``
     LEGAL_TEMPLATES     the document templates; default the packaged ones
@@ -60,7 +64,9 @@ _PAGE = {"Cache-Control": "no-store", "Vary": "Referer, Accept-Language"}
 _CSP = ("default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; "
         "form-action 'none'; frame-ancestors 'none'")
 REVISION = re.compile(r"\A[0-9a-f]{40}\Z")
+ALIAS = re.compile(r"\A[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 DRAFT = "/draft"
+DRAFT_ALIAS = "latest"
 
 
 class ConfigError(SystemExit):
@@ -126,6 +132,17 @@ def load_draft(environ: Mapping[str, str]) -> tuple[Site | None, list[str]]:
     log.warning("legal host: draft %s… at %s/, %d documents; features %s", revision[:8], DRAFT, len(result.files),
                 ", ".join(f"{k}={'on' if v else 'off'}" for k, v in sorted(result.features.items())))
     return site, []
+
+
+def draft_alias(environ: Mapping[str, str]) -> str | None:
+    """The name /draft/<alias>/ redirects from, or None when the deployment turns it off."""
+    alias = environ.get("LEGAL_DRAFT_ALIAS", DRAFT_ALIAS)
+    if not alias:
+        return None
+    if not ALIAS.match(alias) or REVISION.match(alias):
+        raise ConfigError(f"LEGAL_DRAFT_ALIAS={alias!r}: one path segment of letters, digits, '.', '_' or '-', "
+                          "and not a 40-hex commit")
+    return alias
 
 
 def site_app(site: Site, mode: str) -> FastAPI:
@@ -240,17 +257,28 @@ async def _plain(send, status: int, body: bytes, kind: bytes = b"text/plain; cha
 class Host:
     """The stable site at the root; the draft under its prefix, and nowhere else.
 
-    Any other ``/draft/…`` path is a bare 404 that says nothing of what the host holds.
+    ``/draft/<alias>/…`` redirects to the same path in the current draft. Any other
+    ``/draft/…`` path is a bare 404 that says nothing of what the host holds.
     """
 
-    def __init__(self, stable, draft, draft_base: str | None, draft_problems: list[str]):
+    def __init__(self, stable, draft, draft_base: str | None, draft_problems: list[str], alias: str | None = None):
         self.stable, self.draft, self.draft_base, self.draft_problems = stable, draft, draft_base, draft_problems
+        self.alias_base = f"{DRAFT}/{alias}" if alias and draft_base else None
 
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http":
             path = scope["path"]
             if path == DRAFT or path.startswith(DRAFT + "/"):
-                base = self.draft_base
+                base, alias = self.draft_base, self.alias_base
+                if alias and (path == alias or path.startswith(alias + "/")):
+                    target = base + (path[len(alias):] or "/")
+                    if scope.get("query_string"):
+                        target += "?" + scope["query_string"].decode("latin-1")
+                    await send({"type": "http.response.start", "status": 302,
+                                "headers": [(b"location", target.encode("latin-1")), (b"x-robots-tag", b"noindex"),
+                                            (b"cache-control", b"no-store"), (b"content-length", b"0")]})
+                    await send({"type": "http.response.body", "body": b""})
+                    return
                 if not base or (path != base and not path.startswith(base + "/")):
                     await _plain(send, 404, b"Not Found")
                     return
@@ -275,4 +303,4 @@ def create_app(environ: Mapping[str, str] | None = None):
     revision = environ.get("LEGAL_REVISION")
     return Host(site_app(stable, legal_build.FINAL),
                 site_app(draft, legal_build.SAMPLE) if draft else None,
-                f"{DRAFT}/{revision}" if revision else None, problems)
+                f"{DRAFT}/{revision}" if revision else None, problems, draft_alias(environ))
