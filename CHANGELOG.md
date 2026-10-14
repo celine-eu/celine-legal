@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.3.0 (2026-10-14)
+
+### Features
+
+- Allow to track last draft revision
+  ([`b9445d9`](https://github.com/celine-eu/celine-legal/commit/b9445d9836184a657b7b5d5887bd906ad991ad9c))
+
+
 ## v0.2.0 (2026-10-13)
 
 ### Bug Fixes
