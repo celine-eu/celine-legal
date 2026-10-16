@@ -54,6 +54,10 @@ MARKERS: dict[str, dict[tuple[str, str], list[str]]] = {
         ("example-rec/app-privacy-notice", "it"): ["### 2.5 L'assistente AI", "assistente AI"],
         ("example-rec/terms-of-use", "en"): ["## 6. The AI assistant", "AI assistant", "answers from the assistant"],
         ("example-rec/terms-of-use", "it"): ["## 6. L'assistente AI", "assistente AI", "risposte dell'assistente"],
+        ("example-rec-2/terms-of-use", "en"): ["## 6. Assistant based on artificial intelligence", "use the AI assistant",
+                                               "answers from the AI assistant"],
+        ("example-rec-2/terms-of-use", "it"): ["## 6. Assistente basato su intelligenza artificiale",
+                                               "utilizzare l’assistente AI", "risposte dell’assistente AI"],
         ("platform/sub-processors", "en"): ["AI assistant"],
         ("platform/sub-processors", "it"): ["Assistente AI"],
         ("example-rec/data-processing-agreement", "en"): ["AI assistant", "not to provide any to the assistant"],
@@ -63,6 +67,8 @@ MARKERS: dict[str, dict[tuple[str, str], list[str]]] = {
         ("example-rec/app-privacy-notice", "it"): ["Condivisione dei tuoi dati di misura", "scelte di condivisione"],
         ("example-rec/terms-of-use", "en"): ["sharing of your meter readings"],
         ("example-rec/terms-of-use", "it"): ["condivisione dei tuoi dati di misura"],
+        ("example-rec-2/terms-of-use", "en"): ["manage"],
+        ("example-rec-2/terms-of-use", "it"): ["gestire"],
         ("platform/sub-processors", "en"): ["dataspace nodes", "grid operators"],
         ("platform/sub-processors", "it"): ["nodi nel dataspace", "gestori di rete"],
         ("example-rec/data-processing-agreement", "en"): ["independent controller of the meter readings",
@@ -138,6 +144,11 @@ def test_the_sections_after_a_removed_one_are_renumbered():
     assert "## 13. Contacts" in texts[("example-rec/terms-of-use", "en")]
     assert "## 6. Uso corretto" in texts[("example-rec/terms-of-use", "it")]
     assert "## 13. Contatti" in texts[("example-rec/terms-of-use", "it")]
+    # A text that cites its own articles cites them by their new numbers.
+    for lang, contacts in (("en", "Art. 14"), ("it", "art. 14")):
+        text = texts[("example-rec-2/terms-of-use", lang)]
+        assert "## 14. " in text and "## 15. " not in text
+        assert f"{contacts}." in text and "15." not in text.replace("\n", " ")
 
 
 def test_a_list_ending_early_still_ends_with_a_full_stop():

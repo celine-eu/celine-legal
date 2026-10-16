@@ -23,6 +23,10 @@
       "type": "string",
       "description": "the name the texts use after the first mention"
     },
+    "term": {
+      "type": "string",
+      "description": "the term a text defines for the party in quotes, when it is not the short name (e.g. a platform operator's)"
+    },
     "display_name": {
       "type": "string",
       "description": "the name the organisation presents to members (e.g. in an app and in consent texts), when it is neither the legal name nor the short name"

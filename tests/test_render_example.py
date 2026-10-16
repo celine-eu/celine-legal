@@ -260,21 +260,21 @@ def test_with_nothing_published_every_stable_slot_is_pending(tmp_path):
 def test_the_stable_site_serves_the_published_version_while_the_next_is_drafted(tmp_path):
     docs, templates = _copy(tmp_path)
     _publish(docs, templates, "2026-01-01T00:00:00Z")
-    shutil.copytree(templates / "documents/terms-of-use/0.1", templates / "documents/terms-of-use/0.2")
-    page = templates / "documents/terms-of-use/0.2/en.md.j2"
+    shutil.copytree(templates / "documents/terms-of-use/0.1", templates / "documents/terms-of-use/0.9")
+    page = templates / "documents/terms-of-use/0.9/en.md.j2"
     page.write_text(page.read_text().replace("\n## 1.", "\nA drafted paragraph.\n\n## 1.", 1))
     register = yaml.safe_load((docs / "register.yaml").read_text())
     for entry in register["documents"]:
         if entry["id"] == "example-rec/terms-of-use":
-            entry["version"], entry["status"] = "0.2", "draft"
+            entry["version"], entry["status"] = "0.9", "draft"
     (docs / "register.yaml").write_text(yaml.safe_dump(register))
     stable = _site_of(docs, templates, "final")
     assert stable["example-rec/current.json"]["slots"]["terms"]["version"] == "0.1"
     assert stable["example-rec/current.json"]["slots"]["terms"]["status"] == "final"
     assert not any("A drafted paragraph." in v for v in stable.values() if isinstance(v, str))
     draft = _site_of(docs, templates, "sample")
-    assert draft["example-rec/current.json"]["slots"]["terms"]["version"] == "0.2"
-    assert "A drafted paragraph." in draft["example-rec/terms-of-use/0.2/en.md"]
+    assert draft["example-rec/current.json"]["slots"]["terms"]["version"] == "0.9"
+    assert "A drafted paragraph." in draft["example-rec/terms-of-use/0.9/en.md"]
 
 
 def test_an_edited_published_text_is_refused(tmp_path):
@@ -293,29 +293,29 @@ def test_every_published_version_stays_and_a_date_maps_to_one(tmp_path):
     docs, templates = _copy(tmp_path)
     _publish(docs, templates, "2026-01-01T00:00:00Z")
     # A new template version of the terms, then the register moves to it.
-    old, new = templates / "documents/terms-of-use/0.1", templates / "documents/terms-of-use/0.2"
+    old, new = templates / "documents/terms-of-use/0.1", templates / "documents/terms-of-use/0.9"
     shutil.copytree(old, new)
     for lang in ("it", "en"):
         page = new / f"{lang}.md.j2"
         page.write_text(page.read_text().replace("\n## 1.", "\nNew paragraph.\n\n## 1.", 1))
     register = yaml.safe_load((docs / "register.yaml").read_text())
     for entry in register["documents"]:
-        if entry["id"] in ("example-rec/terms-of-use", "example-rec-2/terms-of-use"):
-            entry["version"] = "0.2"
+        if entry["id"] == "example-rec/terms-of-use":
+            entry["version"] = "0.9"
     (docs / "register.yaml").write_text(yaml.safe_dump(register))
     _publish(docs, templates, "2026-03-01T00:00:00Z")
 
     site = _site_of(docs, templates)
-    assert site["example-rec/current.json"]["slots"]["terms"]["version"] == "0.2"
+    assert site["example-rec/current.json"]["slots"]["terms"]["version"] == "0.9"
     assert site["example-rec/current.json"]["slots"]["terms"]["published_at"] == "2026-03-01T00:00:00Z"
     assert "New paragraph." not in site["example-rec/terms-of-use/0.1/it.md"]  # served as published
-    assert "New paragraph." in site["example-rec/terms-of-use/0.2/it.md"]
+    assert "New paragraph." in site["example-rec/terms-of-use/0.9/it.md"]
     history = site["example-rec/history.json"]["slots"]["terms"]
-    assert [h["version"] for h in history] == ["0.1", "0.2"]
+    assert [h["version"] for h in history] == ["0.1", "0.9"]
     assert legal_build.version_at(history, "2025-12-31T23:59:59Z") is None
     assert legal_build.version_at(history, "2026-02-15T10:00:00Z") == "0.1"
-    assert legal_build.version_at(history, "2026-03-01T00:00:00Z") == "0.2"
-    assert legal_build.version_at(history, "2026-09-01T00:00:00Z") == "0.2"
+    assert legal_build.version_at(history, "2026-03-01T00:00:00Z") == "0.9"
+    assert legal_build.version_at(history, "2026-09-01T00:00:00Z") == "0.9"
 
 
 def test_current_and_history_follow_their_schemas(tmp_path):

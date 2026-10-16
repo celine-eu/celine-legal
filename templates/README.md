@@ -37,7 +37,8 @@ deployment moves to it in its register.
 host, at startup) reads:
 
 - `<data>/register.yaml`: per document, `template`, `version`, `langs`, `status`, and
-  `for: {rec: <key>}` or `{dso: <key>}`. Under `recs:` it gives each community's
+  `for: {rec: <key>}` or `{dso: <key>}`; `effective` and `params` where the template reads them
+  (terms-of-use 0.2: `liability_cap_eur`, `liability_period`, `conciliation_body`). Under `recs:` it gives each community's
   `identity` file and grid operator `dso`. Under `features:`, every optional feature.
 - `<data>/parties.yaml`: `roles` (at least `platform_operator`), `parties`, `providers`,
   `processing`, `hosting`, `project`.
@@ -48,7 +49,7 @@ host, at startup) reads:
 
 | Variable | What it is |
 |---|---|
-| `doc` | `id`, `template`, `version`, `status`, `lang`, `langs` |
+| `doc` | `id`, `template`, `version`, `status`, `lang`, `langs`; `effective`, the date the version takes effect (the entry's `effective:`, a blank until set); `params`, the terms a community sets for a template that asks for them (the entry's `params:`) |
 | `rec` | the community the document is rendered for (community documents only) |
 | `dso` | that community's grid operator, or the one a grid-operator document is for |
 | `platform` | the platform operator |

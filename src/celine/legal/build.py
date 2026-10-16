@@ -216,6 +216,10 @@ def context(
             "status": entry.get("status"),
             "lang": lang,
             "langs": list(entry.get("langs") or []),
+            # The date the version takes effect (ISO 8601), as the text states it.
+            "effective": str(entry.get("effective") or BLANK),
+            # The terms a community sets for a template that asks for them.
+            "params": entry.get("params") or {},
         },
         "parties": all_parties,
         "roles": roles,

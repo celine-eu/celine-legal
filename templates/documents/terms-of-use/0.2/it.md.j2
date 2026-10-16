@@ -1,0 +1,228 @@
+{% import 'macros/text.j2' as text %}
+{% import 'macros/durations.j2' as durations %}
+{% set lab = text.term(platform) %}
+{% set skip = 0 if features.ai_assistant else 1 %}
+{% set art = {
+  'availability': 8 - skip, 'termination': 9 - skip, 'changes': 12 - skip,
+  'contacts': 15 - skip,
+} %}
+---
+document: terms-of-use
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+effective: "{{ doc.effective }}"
+lang: {{ doc.lang }}
+---
+
+# Condizioni d’uso della piattaforma digitale {{ rec.short }}
+
+**Versione {{ doc.version }} del {{ text.date(doc.effective, 'it') }}**
+
+## 1. Chi offre il servizio
+
+{% call text.wrap() %}
+La piattaforma digitale della comunità energetica, comprensiva della domanda di adesione online, dell’app della comunità{{ ', dell’assistente basato su sistemi di intelligenza artificiale' if features.ai_assistant else '' }} e delle notifiche (la “Piattaforma”), è offerta da {{ rec.name }} (“{{ rec.short }}”), con sede legale in {{ rec.registered_office }}, {{ text.tax_ids(rec, 'it') }}, e-mail {{ rec.email }}, PEC {{ rec.pec }}.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ rec.short }} è la controparte contrattuale del soggetto che usufruisce della Piattaforma (“Utente”) per i servizi offerti tramite la Piattaforma e risponde delle obbligazioni ad essa riferibili secondo le presenti condizioni. La Piattaforma è sviluppata e gestita tecnologicamente da {{ platform.name }}, con sede legale in {{ platform.registered_office }}, {{ text.tax_ids(platform, 'it') }} (“{{ lab }}”), quale fornitore tecnologico di {{ rec.short }} per progettazione, sviluppo, manutenzione, hosting, supporto tecnico e gestione tecnologica.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ lab }} non è parte del rapporto contrattuale tra {{ rec.short }} e l’Utente, fatte salve le responsabilità che la legge eventualmente pone inderogabilmente e direttamente a suo carico.
+{% endcall %}
+
+Per richieste, reclami e segnalazioni relativi alla Piattaforma, l’Utente può utilizzare i
+contatti indicati all’art. {{ art.contacts }}.
+
+{% call text.wrap() %}
+La Piattaforma è sviluppata nell’ambito del progetto di ricerca {{ project.name }}, finanziato dall’Unione europea tramite il programma {{ project.programme }} (accordo di sovvenzione n. {{ project.grant_agreement }}).
+{% endcall %}
+
+## 2. Oggetto e coordinamento con il rapporto sociale
+
+{% call text.wrap() %}
+Le presenti condizioni disciplinano l’accesso e l’utilizzo della Piattaforma. Non sostituiscono né modificano lo statuto di {{ rec.short }}, il regolamento della comunità energetica o le deliberazioni degli organi sociali, che continuano a disciplinare le materie di rispettiva competenza. In caso di contrasto, le presenti condizioni non derogano alle disposizioni inderogabili di legge né alle competenze e alle regole del rapporto sociale stabilite dallo statuto e dai regolamenti applicabili.
+{% endcall %}
+
+Il trattamento dei dati personali è descritto nell’informativa privacy resa disponibile
+tramite la Piattaforma.
+
+## 3. Chi può usare la Piattaforma
+
+La domanda di adesione alla Piattaforma può essere presentata dai soggetti in possesso dei
+requisiti previsti dallo statuto. L’utilizzo della Piattaforma presuppone l’ammissione a
+socio, secondo lo statuto.
+
+{% call text.wrap() %}
+L’accesso è personale per le persone fisiche. Gli Utenti che agiscono per conto di un’impresa o di un ente devono essere autorizzati a rappresentare il soggetto interessato e sono tenuti a utilizzare la Piattaforma nei limiti dei poteri loro conferiti. Le credenziali non devono essere condivise; l’Utente deve informare tempestivamente {{ rec.short }} se sospetta un uso non autorizzato. L’Utente è responsabile dell’esattezza delle informazioni fornite e deve comunicare tempestivamente eventuali variazioni rilevanti per l’accesso o per l’utilizzo della Piattaforma.
+{% endcall %}
+
+## 4. Funzionalità della Piattaforma
+
+{% call text.wrap() %}
+La Piattaforma permette di: consultare i consumi e la produzione relativa a contatori e dispositivi registrati; visualizzare le previsioni, stime e suggerimenti per lo spostamento dei consumi; aderire a iniziative o impegni collegati ai suggerimenti; raccogliere punti e badge; ricevere le notifiche;{{ ' utilizzare l’assistente AI;' if features.ai_assistant else '' }}{{ ' gestire le preferenze di condivisione dei dati di misura;' if features.dso_data_exchange else '' }} inviare le segnalazioni.
+{% endcall %}
+
+Le funzionalità possono essere modificate, aggiunte o rimosse nel corso del progetto nei
+limiti e secondo le modalità previste dagli artt. {{ art.availability }} e {{ art.changes }}. Le funzionalità effettivamente
+disponibili sono quelle presentate nell’interfaccia della Piattaforma.
+
+## 5. Previsioni, stime e suggerimenti
+
+Previsioni, stime e suggerimenti hanno finalità informative e di supporto e dipendono anche
+dalla qualità, completezza e tempestività dei dati disponibili. Le stime relative agli
+incentivi non sostituiscono i calcoli ufficiali del Gestore dei Servizi Energetici (GSE). Gli
+importi eventualmente spettanti sono determinati secondo la normativa applicabile, lo
+statuto e il regolamento della comunità energetica.
+
+I suggerimenti sono facoltativi. La decisione di seguirli spetta all’Utente, che è tenuto a
+valutarne la pertinenza rispetto alla propria situazione e a verificare le informazioni
+rilevanti prima di assumere decisioni. Di per sé, il mancato utilizzo dei suggerimenti non
+comporta conseguenze sul rapporto sociale. Punti e badge hanno finalità di partecipazione e
+coinvolgimento nella comunità e non hanno valore economico, salvo diversa previsione del
+regolamento o di una deliberazione degli organi sociali.
+
+{% if features.ai_assistant %}
+## 6. Assistente basato su intelligenza artificiale
+
+L’assistente AI è uno strumento sperimentale di supporto informativo basato su sistemi
+automatizzati. Quando lo utilizza, l’Utente interagisce con un sistema automatico e non con
+una persona. Le risposte sono generate sulla base dei dati e degli input ricevuti e gli
+output possono essere incompleti, inesatti, non aggiornati o non pertinenti.
+
+Le risposte non costituiscono consulenza professionale, tecnica, economica, energetica,
+fiscale o legale e non sostituiscono le verifiche dell’Utente o la valutazione di un
+professionista quando necessaria. L’Utente deve verificare le informazioni prima di farvi
+affidamento.
+
+Prima del primo utilizzo, la Piattaforma può chiedere all’Utente di confermare di aver letto
+questo articolo e di aver compreso la natura sperimentale e i limiti dello strumento.
+
+L’Utente può cancellare le conversazioni tramite le funzionalità disponibili. Non deve
+inserire documenti d’identità, dati sanitari o dati personali di terzi, salvo che ciò sia
+strettamente necessario e legittimo. Le modalità di trattamento e conservazione dei dati
+sono descritte nell’informativa privacy.
+
+{% endif %}
+## {{ 7 - skip }}. Uso corretto
+
+L’Utente si impegna a: fornire informazioni accurate e aggiornate; non accedere ai dati di
+altri soci né tentare di aggirare le misure di sicurezza; non utilizzare la Piattaforma per
+scopi illeciti, offensivi o estranei alle sue finalità; non caricare contenuti che violino
+diritti di terzi o norme applicabili; non interferire con il funzionamento della
+Piattaforma, anche mediante accessi automatizzati non autorizzati; proteggere le proprie
+credenziali e segnalare tempestivamente accessi sospetti.
+
+L’Utente è responsabile dei contenuti che inserisce e deve disporre dei diritti e delle
+autorizzazioni necessari per il loro utilizzo secondo le presenti condizioni.
+
+## {{ art.availability }}. Disponibilità, aggiornamenti e modifiche della Piattaforma
+
+{% call text.wrap() %}
+La Piattaforma è sviluppata nell’ambito di un progetto di ricerca e ha natura sperimentale. {{ rec.short }} adotta misure ragionevoli per mantenerla disponibile e sicura, senza poter garantire l’assenza assoluta di interruzioni, errori o ritardi.
+{% endcall %}
+
+Gli interventi di manutenzione programmata sono comunicati tramite la Piattaforma quando
+possibile. I dati visualizzati possono essere tardivi, incompleti o indisponibili, anche
+quando il gestore di rete o altri soggetti non li abbiano ancora resi disponibili.
+
+{% call text.wrap() %}
+Per giustificati motivi tecnici, organizzativi, di sicurezza, normativi o connessi al progetto, {{ rec.short }} può modificare, sostituire, sospendere o interrompere funzionalità della Piattaforma. Le modifiche rilevanti sono comunicate con congruo preavviso, ove ragionevolmente possibile, salvo urgenze di sicurezza o altri motivi che richiedano un intervento immediato.
+{% endcall %}
+
+Quando una modifica incide negativamente e in modo non trascurabile sull’accesso o
+sull’utilizzo di un servizio digitale da parte dell’Utente, l’Utente può cessare l’utilizzo
+secondo l’art. {{ art.termination }}.
+
+## {{ art.termination }}. Sospensione e cessazione
+
+{% call text.wrap() %}
+L’Utente può smettere di utilizzare la Piattaforma in ogni momento, contattando {{ rec.short }} ai recapiti dell’art. {{ art.contacts }}. La cessazione dell’utilizzo della Piattaforma non determina, di per sé, la cessazione del rapporto sociale, che resta disciplinato dallo statuto e dalla normativa applicabile. L’account relativo alla Piattaforma non è più disponibile quando cessa il rapporto sociale.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ rec.short }} può sospendere o limitare temporaneamente l’accesso, nella misura necessaria e proporzionata alle circostanze, in caso di: violazione grave delle presenti condizioni; rischio per la sicurezza della Piattaforma o dei dati; uso illecito o sospetto di uso non autorizzato; interventi urgenti di progettazione, sviluppo o manutenzione; perdita dei requisiti di accesso o dello status di socio. Ove possibile, {{ rec.short }} informa l’Utente delle ragioni della sospensione e delle condizioni per il ripristino dell’accesso. In situazioni urgenti, l’avviso può essere fornito successivamente.
+{% endcall %}
+
+Alla cessazione, i dati personali sono trattati secondo l’informativa privacy e la normativa
+applicabile, inclusi gli eventuali obblighi di conservazione.
+
+## {{ 10 - skip }}. Proprietà intellettuale e contenuti dell’Utente
+
+{% call text.wrap() %}
+Il software della Piattaforma è distribuito nell’ambito del progetto con licenze open source indicate nei rispettivi repository. I diritti di proprietà intellettuale di {{ rec.short }}, {{ lab }} e del progetto {{ project.name }} restano ai rispettivi titolari e non possono essere utilizzati al di fuori delle autorizzazioni applicabili. Nulla nelle presenti condizioni trasferisce all’Utente diritti sul software, sui marchi, sulla documentazione o su altri materiali oltre a quanto espressamente consentito.
+{% endcall %}
+
+{% call text.wrap() %}
+I contenuti inseriti dall’Utente, quali messaggi e segnalazioni, restano nella titolarità dell’Utente o dei rispettivi aventi diritto. L’Utente garantisce di poterli legittimamente caricare e utilizzare. Nei limiti necessari a erogare, far funzionare, proteggere, mantenere e migliorare la Piattaforma nell’ambito del progetto, l’Utente concede a {{ rec.short }} e a {{ lab }} una licenza non esclusiva, gratuita e limitata alle finalità indicate, per il periodo necessario e nei limiti dei diritti di cui dispone. La licenza non attribuisce diritti ulteriori rispetto a quelli necessari per le finalità indicate e resta soggetta alla normativa applicabile in materia di dati personali.
+{% endcall %}
+
+## {{ 11 - skip }}. Responsabilità
+
+{% call text.wrap() %}
+{{ rec.short }} è la controparte contrattuale dell’Utente per i servizi offerti tramite la Piattaforma e risponde dell’adempimento delle obbligazioni ad essa riferibili. {{ lab }} opera quale fornitore tecnologico di {{ rec.short }} e non assume, per effetto delle presenti condizioni, obblighi diretti di erogazione dei servizi di {{ rec.short }} nei confronti dell’Utente.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ 'Previsioni, stime, suggerimenti e risposte dell’assistente AI' if features.ai_assistant else 'Previsioni, stime e suggerimenti' }} hanno finalità informative e possono contenere errori, omissioni o informazioni non aggiornate. Non costituiscono garanzie di risultato. L’Utente deve valutarli criticamente prima di assumere decisioni. La Piattaforma non sostituisce le verifiche sui dati e sulle determinazioni ufficiali degli enti o gestori competenti.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ rec.short }} non garantisce la disponibilità ininterrotta della Piattaforma né l’assenza assoluta di errori. Interruzioni, ritardi, indisponibilità o inesattezze possono dipendere da manutenzione, problemi tecnici, indisponibilità di dati di terzi o eventi non ragionevolmente controllabili.
+{% endcall %}
+
+{% call text.wrap() %}
+Nei limiti consentiti dalla legge, {{ rec.short }} e {{ lab }} non rispondono dei danni indiretti o consequenziali, del mancato guadagno o della perdita di opportunità derivanti dall’uso o dall’impossibilità di utilizzare la Piattaforma, salvo che tali danni siano conseguenza di condotte per le quali la responsabilità non possa essere esclusa o limitata. Nessuna disposizione delle presenti condizioni esclude o limita la responsabilità per dolo o colpa grave, né ogni altra responsabilità che non possa essere esclusa o limitata per legge.
+{% endcall %}
+
+{% call text.wrap() %}
+Nei limiti consentiti dalla legge e in relazione alle obbligazioni effettivamente assunte dalla parte interessata, la responsabilità complessiva di {{ rec.short }} e/o {{ lab }} per danni direttamente derivanti dall’utilizzo della Piattaforma è limitata a {{ doc.params.liability_cap_eur }} Euro per Utente nel corso dei {{ durations.span(doc.params.liability_period, 'it') }} precedenti l’evento che ha dato origine alla responsabilità. Il limite non si applica ai casi in cui l’esclusione o limitazione sia vietata dalla legge.
+{% endcall %}
+
+{% call text.wrap() %}
+L’Utente può rivolgere a {{ rec.short }} le richieste relative al rapporto contrattuale per i servizi offerti da {{ rec.short }}, utilizzando i recapiti dell’art. {{ art.contacts }}.
+{% endcall %}
+
+{% call text.wrap() %}
+L’Utente si impegna a tenere indenni {{ rec.short }} e {{ lab }}, nei limiti consentiti dalla legge, da pretese di terzi, costi e danni ragionevolmente documentati derivanti da un uso illecito della Piattaforma imputabile all’Utente, dalla violazione delle presenti condizioni o dall’inserimento di dati o contenuti che violino diritti di terzi.
+{% endcall %}
+
+{% call text.wrap() %}
+Le limitazioni di responsabilità, esclusioni, esenzioni e manleve previste dal presente articolo a favore di {{ lab }} sono stipulate a favore di terzo ai sensi dell’art. 1411 c.c.
+{% endcall %}
+
+## {{ art.changes }}. Modifiche delle condizioni
+
+{% call text.wrap() %}
+{{ rec.short }} può modificare le presenti condizioni per ragioni connesse a cambiamenti del servizio, del progetto, dell’organizzazione o della normativa. La versione aggiornata indica la data di entrata in vigore e viene resa disponibile tramite la Piattaforma.
+{% endcall %}
+
+{% call text.wrap() %}
+Quando la natura della modifica richiede una nuova accettazione, {{ rec.short }} sottopone la nuova versione all’Utente prima che questa divenga applicabile. Se l’Utente non accetta le modifiche necessarie per proseguire l’utilizzo, non può continuare a utilizzare la Piattaforma secondo la versione aggiornata; ciò non determina di per sé la cessazione del rapporto sociale.
+{% endcall %}
+
+## {{ 13 - skip }}. Legge applicabile e controversie
+
+{% call text.wrap() %}
+Le presenti condizioni sono disciplinate dalla legge italiana. Le parti possono ricorrere a un tentativo di conciliazione presso la {{ doc.params.conciliation_body.it }} secondo il regolamento applicabile, ove pertinente e previo coordinamento con lo statuto di {{ rec.short }}. La previsione non costituisce clausola compromissoria e non comporta rinuncia a diritti o rimedi inderogabili.
+{% endcall %}
+
+## {{ 14 - skip }}. Disposizioni finali
+
+L’eventuale nullità, invalidità o inefficacia di una disposizione delle presenti condizioni
+non comporta, nei limiti consentiti dalla legge, la nullità delle restanti disposizioni. La
+disposizione interessata è interpretata o sostituita, ove possibile, in modo conforme alla
+legge e il più vicino possibile alla sua finalità lecita.
+
+{% call text.wrap() %}
+L’Utente non può cedere a terzi i diritti e gli obblighi derivanti dalle presenti condizioni senza il previo consenso scritto di {{ rec.short }}. Restano efficaci dopo la cessazione le disposizioni che, per loro natura, sono destinate a sopravvivere.
+{% endcall %}
+
+## {{ art.contacts }}. Contatti
+
+Per domande, segnalazioni, reclami, sospensioni e cessazioni relativi alle presenti
+condizioni o alla Piattaforma: {{ rec.email }}.
+
+Per questioni relative alla privacy: {{ rec.privacy_contact }}.

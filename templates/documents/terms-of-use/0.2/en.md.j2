@@ -1,0 +1,225 @@
+{% import 'macros/text.j2' as text %}
+{% import 'macros/durations.j2' as durations %}
+{% set lab = text.term(platform) %}
+{% set skip = 0 if features.ai_assistant else 1 %}
+{% set art = {
+  'availability': 8 - skip, 'termination': 9 - skip, 'changes': 12 - skip,
+  'contacts': 15 - skip,
+} %}
+---
+document: terms-of-use
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+effective: "{{ doc.effective }}"
+lang: {{ doc.lang }}
+---
+
+# Terms of use of the {{ rec.short }} digital platform
+
+**Version {{ doc.version }} of {{ text.date(doc.effective, 'en') }}**
+
+## 1. Who provides the service
+
+{% call text.wrap() %}
+The digital platform of the energy community, comprising the online membership application, the community app{{ ', the assistant based on artificial intelligence systems' if features.ai_assistant else '' }} and notifications (the “Platform”), is provided by {{ rec.name }} (“{{ rec.short }}”), with registered office at {{ rec.registered_office }}, {{ rec.country.en }}, {{ text.tax_ids(rec, 'en') }}, email {{ rec.email }}, PEC {{ rec.pec }}.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ rec.short }} is the contractual counterparty of the person who uses the Platform (the “User”) for the services offered through the Platform, and is liable for the obligations attributable to it under these terms. The Platform is developed and technically operated by {{ platform.name }}, with registered office at {{ platform.registered_office }}, {{ platform.country.en }}, {{ text.tax_ids(platform, 'en') }} (“{{ lab }}”), as {{ text.poss(rec.short) }} technology provider for design, development, maintenance, hosting, technical support and technical operation.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ lab }} is not a party to the contractual relationship between {{ rec.short }} and the User, without prejudice to any liability that the law places mandatorily and directly on it.
+{% endcall %}
+
+For requests, complaints and reports concerning the Platform, the User may use the contacts
+given in Art. {{ art.contacts }}.
+
+{% call text.wrap() %}
+The Platform is developed within the {{ project.name }} research project, funded by the European Union under the {{ project.programme }} programme (grant agreement No. {{ project.grant_agreement }}).
+{% endcall %}
+
+## 2. Subject matter and relationship with membership
+
+{% call text.wrap() %}
+These terms govern access to and use of the Platform. They do not replace or amend the statute of {{ rec.short }}, the rules of the energy community or the resolutions of its governing bodies, which continue to govern the matters within their respective competence. In the event of conflict, these terms do not derogate from mandatory provisions of law, nor from the competences and rules of membership laid down by the statute and the applicable rules.
+{% endcall %}
+
+The processing of personal data is described in the privacy notice made available through
+the Platform.
+
+## 3. Who may use the Platform
+
+An application for membership through the Platform may be submitted by those who meet the
+requirements of the statute. Use of the Platform requires admission as a member, in
+accordance with the statute.
+
+{% call text.wrap() %}
+Access is personal for natural persons. Users acting on behalf of a business or an organisation must be authorised to represent it, and must use the Platform within the powers conferred on them. Credentials must not be shared; the User must promptly inform {{ rec.short }} if they suspect unauthorised use. The User is responsible for the accuracy of the information provided and must promptly report any change relevant to access to or use of the Platform.
+{% endcall %}
+
+## 4. Features of the Platform
+
+{% call text.wrap() %}
+The Platform allows the User to: view the consumption and production of registered meters and devices; view forecasts, estimates and suggestions for shifting consumption; take part in initiatives or commitments linked to the suggestions; collect points and badges; receive notifications;{{ ' use the AI assistant;' if features.ai_assistant else '' }}{{ ' manage preferences for the sharing of meter readings;' if features.dso_data_exchange else '' }} send reports.
+{% endcall %}
+
+Features may be changed, added or removed during the project, within the limits and in the
+manner set out in Arts. {{ art.availability }} and {{ art.changes }}. The features actually available are those presented in
+the Platform's interface.
+
+## 5. Forecasts, estimates and suggestions
+
+Forecasts, estimates and suggestions are for information and support, and depend among
+other things on the quality, completeness and timeliness of the data available. Estimates
+of incentives do not replace the official calculations of the Gestore dei Servizi
+Energetici (GSE). Any amounts due are determined in accordance with the applicable law, the
+statute and the rules of the energy community.
+
+Suggestions are optional. The decision to follow them rests with the User, who should assess
+their relevance to their own situation and check the relevant information before making
+decisions. In itself, not following the suggestions has no consequences for membership.
+Points and badges serve participation and engagement in the community and have no monetary
+value, unless the rules or a resolution of the governing bodies provide otherwise.
+
+{% if features.ai_assistant %}
+## 6. Assistant based on artificial intelligence
+
+The AI assistant is an experimental information-support tool based on automated systems.
+When using it, the User interacts with an automated system and not with a person. Answers
+are generated from the data and inputs received, and outputs may be incomplete, inaccurate,
+out of date or not relevant.
+
+Answers do not constitute professional, technical, economic, energy, tax or legal advice,
+and do not replace the User's own checks or the assessment of a professional where needed.
+The User must check the information before relying on it.
+
+Before first use, the Platform may ask the User to confirm that they have read this article
+and understood the experimental nature and the limits of the tool.
+
+The User may delete conversations using the features available. The User must not enter
+identity documents, health data or personal data of third parties, unless this is strictly
+necessary and lawful. How the data is processed and kept is described in the privacy
+notice.
+
+{% endif %}
+## {{ 7 - skip }}. Proper use
+
+The User undertakes to: provide accurate and up-to-date information; not access the data of
+other members nor attempt to circumvent security measures; not use the Platform for
+unlawful or offensive purposes or for purposes unrelated to its aims; not upload content
+that infringes the rights of third parties or applicable rules; not interfere with the
+operation of the Platform, including through unauthorised automated access; protect their
+credentials and promptly report suspicious access.
+
+The User is responsible for the content they enter and must hold the rights and
+authorisations needed for its use under these terms.
+
+## {{ art.availability }}. Availability, updates and changes to the Platform
+
+{% call text.wrap() %}
+The Platform is developed within a research project and is experimental in nature. {{ rec.short }} takes reasonable measures to keep it available and secure, but cannot guarantee the complete absence of interruptions, errors or delays.
+{% endcall %}
+
+Scheduled maintenance is announced through the Platform when possible. The data displayed
+may be late, incomplete or unavailable, including when the grid operator or other parties
+have not yet made it available.
+
+{% call text.wrap() %}
+For justified technical, organisational, security, regulatory or project-related reasons, {{ rec.short }} may change, replace, suspend or discontinue features of the Platform. Significant changes are announced with reasonable notice, where reasonably possible, except for security emergencies or other reasons that require immediate action.
+{% endcall %}
+
+Where a change negatively and more than marginally affects the User's access to or use of a
+digital service, the User may stop using it in accordance with Art. {{ art.termination }}.
+
+## {{ art.termination }}. Suspension and termination
+
+{% call text.wrap() %}
+The User may stop using the Platform at any time by contacting {{ rec.short }} at the contacts in Art. {{ art.contacts }}. Ceasing to use the Platform does not in itself end membership, which remains governed by the statute and the applicable law. The Platform account is no longer available once membership ends.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ rec.short }} may temporarily suspend or restrict access, to the extent necessary and proportionate to the circumstances, in the event of: serious breach of these terms; risk to the security of the Platform or of the data; unlawful use or suspected unauthorised use; urgent design, development or maintenance work; loss of the requirements for access or of member status. Where possible, {{ rec.short }} informs the User of the reasons for the suspension and of the conditions for restoring access. In urgent situations, notice may be given afterwards.
+{% endcall %}
+
+On termination, personal data is processed in accordance with the privacy notice and the
+applicable law, including any retention obligations.
+
+## {{ 10 - skip }}. Intellectual property and User content
+
+{% call text.wrap() %}
+The software of the Platform is distributed within the project under the open-source licences stated in the respective repositories. The intellectual property rights of {{ rec.short }}, {{ lab }} and the {{ project.name }} project remain with their respective holders and may not be used outside the applicable authorisations. Nothing in these terms transfers to the User any right in the software, trademarks, documentation or other materials beyond what is expressly permitted.
+{% endcall %}
+
+{% call text.wrap() %}
+Content entered by the User, such as messages and reports, remains the property of the User or of the respective rights holders. The User warrants that they may lawfully upload and use it. To the extent necessary to provide, operate, protect, maintain and improve the Platform within the project, the User grants {{ rec.short }} and {{ lab }} a non-exclusive, royalty-free licence limited to the purposes stated, for the period necessary and within the limits of the rights the User holds. The licence confers no rights beyond those needed for the purposes stated and remains subject to the applicable law on personal data.
+{% endcall %}
+
+## {{ 11 - skip }}. Liability
+
+{% call text.wrap() %}
+{{ rec.short }} is the User's contractual counterparty for the services offered through the Platform and is liable for performing the obligations attributable to it. {{ lab }} acts as {{ text.poss(rec.short) }} technology provider and, by virtue of these terms, assumes no direct obligation towards the User to provide {{ text.poss(rec.short) }} services.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ 'Forecasts, estimates, suggestions and answers from the AI assistant' if features.ai_assistant else 'Forecasts, estimates and suggestions' }} are for information and may contain errors, omissions or out-of-date information. They are not guarantees of results. The User must assess them critically before making decisions. The Platform does not replace checks on the data and on the official determinations of the competent bodies or operators.
+{% endcall %}
+
+{% call text.wrap() %}
+{{ rec.short }} does not guarantee uninterrupted availability of the Platform or the complete absence of errors. Interruptions, delays, unavailability or inaccuracies may result from maintenance, technical problems, unavailability of third-party data or events beyond reasonable control.
+{% endcall %}
+
+{% call text.wrap() %}
+To the extent permitted by law, {{ rec.short }} and {{ lab }} are not liable for indirect or consequential damage, loss of profit or loss of opportunity arising from the use of or inability to use the Platform, unless such damage results from conduct for which liability cannot be excluded or limited. Nothing in these terms excludes or limits liability for wilful misconduct or gross negligence, or any other liability that cannot be excluded or limited by law.
+{% endcall %}
+
+{% call text.wrap() %}
+To the extent permitted by law and in relation to the obligations actually assumed by the party concerned, the total liability of {{ rec.short }} and/or {{ lab }} for damage arising directly from the use of the Platform is limited to {{ doc.params.liability_cap_eur }} euros per User over the {{ durations.span(doc.params.liability_period, 'en') }} preceding the event giving rise to liability. The limit does not apply where exclusion or limitation is prohibited by law.
+{% endcall %}
+
+{% call text.wrap() %}
+The User may address to {{ rec.short }} requests concerning the contractual relationship for the services offered by {{ rec.short }}, using the contacts in Art. {{ art.contacts }}.
+{% endcall %}
+
+{% call text.wrap() %}
+The User undertakes to indemnify {{ rec.short }} and {{ lab }}, to the extent permitted by law, against third-party claims, costs and reasonably documented damage arising from unlawful use of the Platform attributable to the User, from breach of these terms, or from the entry of data or content that infringes the rights of third parties.
+{% endcall %}
+
+{% call text.wrap() %}
+The limitations of liability, exclusions, exemptions and indemnities provided in this article in favour of {{ lab }} are stipulated in favour of a third party under Art. 1411 of the Italian Civil Code.
+{% endcall %}
+
+## {{ art.changes }}. Changes to the terms
+
+{% call text.wrap() %}
+{{ rec.short }} may change these terms for reasons connected with changes to the service, the project, the organisation or the law. The updated version states the date it takes effect and is made available through the Platform.
+{% endcall %}
+
+{% call text.wrap() %}
+Where the nature of the change requires a new acceptance, {{ rec.short }} submits the new version to the User before it becomes applicable. If the User does not accept the changes needed to continue using the Platform, they cannot continue to use it under the updated version; this does not in itself end membership.
+{% endcall %}
+
+## {{ 13 - skip }}. Governing law and disputes
+
+{% call text.wrap() %}
+These terms are governed by Italian law. The parties may attempt conciliation before the {{ doc.params.conciliation_body.en }} under its applicable rules, where relevant and subject to coordination with the statute of {{ rec.short }}. This provision is not an arbitration clause and does not entail a waiver of any mandatory right or remedy.
+{% endcall %}
+
+## {{ 14 - skip }}. Final provisions
+
+If any provision of these terms is void, invalid or ineffective, to the extent permitted by
+law the remaining provisions are not affected. The provision concerned is interpreted or
+replaced, where possible, in accordance with the law and as close as possible to its lawful
+purpose.
+
+{% call text.wrap() %}
+The User may not assign to third parties the rights and obligations arising from these terms without the prior written consent of {{ rec.short }}. Provisions which by their nature are intended to survive remain in force after termination.
+{% endcall %}
+
+## {{ art.contacts }}. Contacts
+
+For questions, reports, complaints, suspensions and terminations concerning these terms or
+the Platform: {{ rec.email }}.
+
+For privacy matters: {{ rec.privacy_contact }}.

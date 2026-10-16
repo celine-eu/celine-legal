@@ -30,6 +30,7 @@ parties:
   example-platform:
     name: "Example Platform S.r.l."
     short: "Example Platform"
+    term: "ExampleOps"   # the term the terms of use define for it
     kind: platform-operator
     legal_form: "società a responsabilità limitata"
     registered_office: "Via Piattaforma 2, 00100 Exampletown (EX)"

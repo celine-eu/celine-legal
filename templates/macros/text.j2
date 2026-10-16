@@ -23,5 +23,33 @@
 {%- endif -%}
 {% endmacro %}
 
+{#- An ISO 8601 date as the texts say it: "1 dicembre 2026", "1 December 2026". A blank
+    stays a blank. -#}
+{% set months = {
+  'it': ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto',
+         'settembre', 'ottobre', 'novembre', 'dicembre'],
+  'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+         'September', 'October', 'November', 'December'],
+} %}
+{% macro date(iso, lang) %}
+{%- if iso | length == 10 and iso[4] == '-' -%}
+{{ iso[8:] | int }} {{ months[lang][iso[5:7] | int - 1] }} {{ iso[:4] }}
+{%- else -%}
+{{ iso }}
+{%- endif -%}
+{% endmacro %}
+
+{#- A tax code and VAT number: "C.F. e P. IVA X" when they are the same, each otherwise. -#}
+{% macro tax_ids(party, lang) %}
+{%- if lang == 'it' -%}
+{{ 'C.F. e P. IVA ' ~ party.tax_code if party.tax_code == party.vat else 'C.F. ' ~ party.tax_code ~ ', P. IVA ' ~ party.vat }}
+{%- else -%}
+{{ 'tax code and VAT number ' ~ party.tax_code if party.tax_code == party.vat else 'tax code ' ~ party.tax_code ~ ', VAT number ' ~ party.vat }}
+{%- endif -%}
+{% endmacro %}
+
+{#- The term a text defines for a party in quotes: its `term`, or else its short name. -#}
+{% macro term(party) %}{{ party.term if party.term is defined else party.short }}{% endmacro %}
+
 {#- A phrase with its first letter in capitals, the rest as it is. -#}
 {% macro cap(phrase) %}{{ phrase[:1] | upper }}{{ phrase[1:] }}{% endmacro %}
