@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.4.0 (2026-10-16)
+
+### Features
+
+- Improve general terms
+  ([`10b323a`](https://github.com/celine-eu/celine-legal/commit/10b323ab938cf796df4c2f0641eea91479f0cfe3))
+
+
 ## v0.3.0 (2026-10-14)
 
 ### Features
