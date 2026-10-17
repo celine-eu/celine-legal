@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.5.0 (2026-10-17)
+
+### Features
+
+- Update declaration section
+  ([`f0fc85f`](https://github.com/celine-eu/celine-legal/commit/f0fc85ff0d1a9bf81eeddc962aa274432369bd90))
+
+
 ## v0.4.0 (2026-10-16)
 
 ### Features
