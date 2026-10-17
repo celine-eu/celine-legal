@@ -417,3 +417,19 @@ def test_missing_offers_are_reported_not_a_crash(tmp_path):
     shutil.copytree(EXAMPLE, docs)
     (docs / "sharing-offers.yaml").unlink()
     assert [p for p in legal_build.build(docs).problems if p.startswith("no sharing offers at")]
+
+
+def test_current_carries_what_a_member_declares_on_accepting_the_terms():
+    """The boxes' words come with the text (its front matter), never from an application."""
+    import json
+
+    site = _site()
+    terms = json.loads(site["example-rec-2/current.json"])["slots"]["terms"]
+    assert set(terms["declarations"]) == {"it", "en"}
+    for lang in ("it", "en"):
+        said = terms["declarations"][lang]
+        assert said == legal_build.declarations_of(site[f"example-rec-2/terms-of-use/0.2/{lang}.md"])
+        assert "0.2" in said["general"]
+        assert "1341" in said["specific_approval"]["text"]
+    # A text that declares nothing (terms 0.1) gives the slot no declarations.
+    assert "declarations" not in json.loads(site["example-rec/current.json"])["slots"]["terms"]

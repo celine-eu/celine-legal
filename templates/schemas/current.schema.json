@@ -31,7 +31,14 @@
         "texts": {"$ref": "#/$defs/by_lang"},
         "sha256": {"$ref": "#/$defs/by_lang"},
         "titles": {"$ref": "#/$defs/by_lang"},
-        "approval_sha256": {"$ref": "#/$defs/by_lang", "description": "A draft only: the sha256 each text will have once final, which the parties approve (register approved_sha256)"}
+        "approval_sha256": {"$ref": "#/$defs/by_lang", "description": "A draft only: the sha256 each text will have once final, which the parties approve (register approved_sha256)"},
+        "declarations": {
+          "type": "object",
+          "description": "Per language, what a member declares on accepting the text, from its front matter (so inside its sha256): an application shows these words as they are. `general` accepts the whole text; `specific_approval` is a separate act (Art. 1341(2) c.c.), its own unticked box recorded on its own",
+          "minProperties": 1,
+          "patternProperties": {"^[a-z]{2}$": {"$ref": "#/$defs/declarations"}},
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },
@@ -46,6 +53,23 @@
         "title": {"type": ["string", "null"]},
         "captured": {"type": ["string", "null"]},
         "sha256": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "declarations": {
+      "type": "object",
+      "required": ["general"],
+      "properties": {
+        "general": {"type": "string"},
+        "specific_approval": {
+          "type": "object",
+          "required": ["text", "articles"],
+          "properties": {
+            "text": {"type": "string"},
+            "articles": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1}}
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },

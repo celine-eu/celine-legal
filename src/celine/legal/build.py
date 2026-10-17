@@ -506,6 +506,19 @@ class SiteFile:
     text: str
 
 
+def declarations_of(text: str) -> dict | None:
+    """What a member declares on accepting a text, from its front matter (`declarations`).
+
+    The words of the acceptance boxes are part of the text, so they are inside its sha256
+    and an application shows them as they are: `general` (accepting the whole text) and
+    `specific_approval` (`text`, and its `articles`) where clauses need their own approval.
+    """
+    match = _FRONT.match(text)
+    front = yaml.safe_load(match.group(1)) if match else None
+    found = front.get("declarations") if isinstance(front, dict) else None
+    return found if isinstance(found, dict) else None
+
+
 def title_of(text: str, default: str) -> str:
     """A text's first ``# `` heading, past its front matter."""
     match = _FRONT.match(text)
@@ -554,6 +567,7 @@ def site(result: Build, data: Path, mode: str, label: dict | None = None) -> tup
             "sha256": sha256(rendered.text),
             "approval_sha256": rendered.approval_sha256,
             "title": title_of(rendered.text, rendered.entry_id),
+            "declarations": declarations_of(rendered.text),
             "status": rendered.status,
             "published_at": rendered.published_at,
             "release": rendered.release,
@@ -609,6 +623,9 @@ def site(result: Build, data: Path, mode: str, label: dict | None = None) -> tup
             "sha256": {lang: by_lang[lang]["sha256"] for lang in langs},
             "titles": {lang: by_lang[lang]["title"] for lang in langs},
         }
+        declarations = {lang: by_lang[lang]["declarations"] for lang in langs if by_lang[lang]["declarations"]}
+        if declarations:
+            value["declarations"] = declarations
         if status != "final":
             value["approval_sha256"] = {lang: by_lang[lang]["approval_sha256"] for lang in langs}
         return value
@@ -658,7 +675,8 @@ def site(result: Build, data: Path, mode: str, label: dict | None = None) -> tup
     files.append(SiteFile("healthz", "ok\n"))
     if catalogue:
         index = [
-            {"id": entry_id, "version": version, "lang": lang, **page,
+            {"id": entry_id, "version": version, "lang": lang,
+             **{k: v for k, v in page.items() if k != "declarations"},
              "owners": _owners(entries.get(entry_id, {}))}
             for (entry_id, version), by_lang in sorted(pages.items())
             for lang, page in by_lang.items()

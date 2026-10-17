@@ -6,6 +6,19 @@
   'availability': 8 - skip, 'termination': 9 - skip, 'changes': 12 - skip,
   'contacts': 15 - skip,
 } %}
+{#- The clauses the User approves specifically (Art. 1341(2) c.c.), numbered like their
+    headings: the front matter's `declarations` say them, so they are inside the sha256. -#}
+{% set clauses = [(5, 'previsioni, stime e suggerimenti')] %}
+{% if features.ai_assistant %}{% set clauses = clauses + [(6, 'assistente basato su intelligenza artificiale')] %}{% endif %}
+{% set clauses = clauses + [
+  (7 - skip, 'uso corretto'),
+  (art.availability, 'disponibilità, aggiornamenti e modifiche della Piattaforma'),
+  (art.termination, 'sospensione e cessazione'),
+  (10 - skip, 'proprietà intellettuale e contenuti dell’Utente'),
+  (11 - skip, 'responsabilità'),
+  (art.changes, 'modifiche delle condizioni'),
+  (13 - skip, 'legge applicabile e controversie'),
+] %}
 ---
 document: terms-of-use
 rec: {{ rec.key }}
@@ -13,6 +26,11 @@ status: {{ doc.status }}
 version: "{{ doc.version }}"
 effective: "{{ doc.effective }}"
 lang: {{ doc.lang }}
+declarations:
+  general: "Dichiaro di aver avuto accesso alle Condizioni d’uso della piattaforma digitale {{ rec.short }}, versione {{ doc.version }} del {{ text.date(doc.effective, 'it') }}, di averne potuto prendere visione e di accettarle integralmente."
+  specific_approval:
+    text: "Ai sensi e per gli effetti degli artt. 1341 e 1342 c.c., dichiaro di approvare specificamente le seguenti clausole: {% for n, t in clauses %}art. {{ n }} ({{ t }}){{ '.' if loop.last else '; ' }}{% endfor %}"
+    articles: [{{ clauses | map('first') | join(', ') }}]
 ---
 
 # Condizioni d’uso della piattaforma digitale {{ rec.short }}

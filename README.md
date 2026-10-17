@@ -159,6 +159,14 @@ texts. The sha256 is the text's, not the page's: restyling a page changes nothin
 accepted. The applications link `<host>/<rec>/<slot>/`, which redirects for good to
 `/<slot>/<rec>`.
 
+A text may say what a member declares on accepting it, in its front matter
+(`declarations`), which `current.json` repeats per language: `general`, the sentence of the
+acceptance box, and `specific_approval` (`text`, `articles`) where clauses need their own
+approval (Art. 1341(2) c.c.: a separate box, not ticked in advance, recorded on its own).
+Applications show these words as they are and never compose their own. The words are part
+of the text, so they are inside its sha256 and renumber with its articles when a feature
+takes one out. Terms of use 0.2 declares both.
+
 ## A deployment's data
 
 Keep it in the deployment's own, private repository, and mount it. This repository holds

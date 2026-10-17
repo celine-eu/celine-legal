@@ -275,3 +275,20 @@ def test_a_transfer_goes_with_its_provider(tmp_path):
             assert phrase not in texts[key], (key, phrase)
     # and the texts read exactly as with no provider stating one
     assert texts == _texts(_without_transfers(tmp_path), off=("sms_verification",))
+
+
+@pytest.mark.parametrize("off", [(), ("ai_assistant",)])
+def test_the_clauses_approved_specifically_are_the_articles_by_their_numbers(off):
+    """Box 2 names each clause by its heading's number and title, renumbered with them."""
+    import re
+
+    texts = _all_on() if not off else _texts(off=off)
+    for lang, art in (("it", "art."), ("en", "Art.")):
+        text = texts[("example-rec-2/terms-of-use", lang)]
+        approval = legal_build.declarations_of(text)["specific_approval"]
+        cited = re.findall(rf"{re.escape(art)} (\d+) \(([^)]+)\)", approval["text"])
+        assert [int(n) for n, _ in cited] == approval["articles"]
+        headings = dict(re.findall(r"^## (\d+)\. (.+)$", text, re.M))
+        for number, title in cited:
+            assert headings[number].lower() == title.lower(), (lang, number, title)
+        assert approval["articles"][-1] == (12 if off else 13)

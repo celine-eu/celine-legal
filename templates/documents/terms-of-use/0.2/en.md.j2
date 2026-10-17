@@ -6,6 +6,19 @@
   'availability': 8 - skip, 'termination': 9 - skip, 'changes': 12 - skip,
   'contacts': 15 - skip,
 } %}
+{#- The clauses the User approves specifically (Art. 1341(2) c.c.), numbered like their
+    headings: the front matter's `declarations` say them, so they are inside the sha256. -#}
+{% set clauses = [(5, 'forecasts, estimates and suggestions')] %}
+{% if features.ai_assistant %}{% set clauses = clauses + [(6, 'assistant based on artificial intelligence')] %}{% endif %}
+{% set clauses = clauses + [
+  (7 - skip, 'proper use'),
+  (art.availability, 'availability, updates and changes to the Platform'),
+  (art.termination, 'suspension and termination'),
+  (10 - skip, 'intellectual property and User content'),
+  (11 - skip, 'liability'),
+  (art.changes, 'changes to the terms'),
+  (13 - skip, 'governing law and disputes'),
+] %}
 ---
 document: terms-of-use
 rec: {{ rec.key }}
@@ -13,6 +26,11 @@ status: {{ doc.status }}
 version: "{{ doc.version }}"
 effective: "{{ doc.effective }}"
 lang: {{ doc.lang }}
+declarations:
+  general: "I declare that I have had access to the Terms of use of the {{ rec.short }} digital platform, version {{ doc.version }} of {{ text.date(doc.effective, 'en') }}, that I have been able to read them and that I accept them in full."
+  specific_approval:
+    text: "Pursuant to and for the purposes of Articles 1341 and 1342 of the Italian Civil Code, I specifically approve the following clauses: {% for n, t in clauses %}Art. {{ n }} ({{ t }}){{ '.' if loop.last else '; ' }}{% endfor %}"
+    articles: [{{ clauses | map('first') | join(', ') }}]
 ---
 
 # Terms of use of the {{ rec.short }} digital platform
