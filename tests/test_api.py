@@ -91,7 +91,7 @@ def _view(client, path, referer=None, accept_language=None, **query):
 def test_the_landing_page_shows_the_platform_documents_only(final):
     view = _view(final, "/").json()
     assert view["view"] == "landing" and view["organisation"] is None
-    assert {d["slot"] for d in view["platform"]} == {"sub-processors", "participation-agreement"}
+    assert {d["slot"] for d in view["platform"]} == {"sub-processors", "research-notice", "participation-agreement"}
     assert _named(json.dumps(view)) == set()
     assert view["catalogue"] is False
 
@@ -193,7 +193,7 @@ def test_an_organisation_overview_lists_its_documents_and_the_platforms(final):
     view = _view(final, "/example-rec-2").json()
     assert view["view"] == "organisation"
     assert {d["url"] for d in view["documents"]} == {"/privacy/example-rec-2", "/terms/example-rec-2"}
-    assert {d["url"] for d in view["platform"]} == {"/sub-processors", "/participation-agreement"}
+    assert {d["url"] for d in view["platform"]} == {"/sub-processors", "/research-notice", "/participation-agreement"}
     assert _named(json.dumps(view)) == {"example-rec-2"}
 
 

@@ -11,7 +11,8 @@ law. A deployment outside that regime needs its own template versions.
 ## Layout
 
 ```text
-documents/<document>/<version>/   one template version: <lang>.md.j2 per language
+documents/<document>/<version>/   one template version: <lang>.md.j2 per language, and
+                                  links.yaml, the references its page links
 consent-texts/<version>/          the words a member reads per data-sharing offer,
                                   generated from the offers (one template per purpose)
 features.yaml                     the optional features these templates describe (`features.<name>`)
@@ -66,6 +67,38 @@ provider, say) inside the condition, so a deployment without the feature need no
 Where a whole numbered section goes, the sections after it are renumbered, and a list that
 ends early still ends with a full stop. With every feature on, the text must read exactly as
 before: `tests/test_features.py` renders the example with each feature off and with all off.
+
+## Links between texts
+
+A text refers to other texts ("l'elenco dei sub-responsabili") and to its own articles
+("art. 15", "§4"). The legal host links them on the page, without changing the text, so its
+sha256 and the fingerprint the parties approve stay the same.
+
+- **Anchors.** Every numbered heading gets one: `## 5. …` is `#sec-5`, `### 2.1 …` is
+  `#sec-2-1`, `## Annex 3 — …` (or `Allegato 3`) is `#annex-3`. An application can link an
+  article directly: `<terms url>#sec-9`.
+- **References.** A template version declares its own in `links.yaml`, beside its
+  `<lang>.md.j2`, per language:
+
+  ```yaml
+  it:
+    - {find: 'elenco dei sub-responsabili della piattaforma', slot: sub_processors}
+    - {find: 'art\. (\d+)(?!\d)', anchor: 'sec-{1}'}
+    - {find: 'privacy notice for the platform, §6', slot: privacy, anchor: sec-6}
+  ```
+
+  `find` is a regular expression over the page's text (a space matches any whitespace, so
+  a line break does too; headings and existing links are left alone). `slot` names the
+  document referred to: the owner's slot of that name, else the platform's, and when
+  neither exists the words stay unlinked. `anchor` is a heading there, or in this text
+  when there is no `slot`; `{1}` is the first group, dots written as dashes.
+- The slot names the templates refer to: `privacy`, `terms`, `data_sharing_notice`,
+  `member_privacy_notice` (the community's own notice for members), `regulations`,
+  `statute`, `sub_processors`.
+
+Every `find` must match the example's text (`tests/test_links.py`), so a reference a new
+wording drops fails there. Adding a `links.yaml` to a published template version is allowed:
+it changes the page, not the text.
 
 ## Adding a feature
 

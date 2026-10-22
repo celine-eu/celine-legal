@@ -125,7 +125,7 @@ def test_a_feature_switched_off_changes_no_other_feature_text(feature):
 
 def test_every_feature_off_still_renders_every_document():
     texts = _texts(off=tuple(FEATURES))
-    only_for_dso = {k for k in _all_on() if not k[0].startswith(("platform/sub", "example-rec/app", "example-rec/terms",
+    only_for_dso = {k for k in _all_on() if not k[0].startswith(("platform/sub", "platform/research", "example-rec/app", "example-rec/terms",
                                                                      "example-rec-2/", "example-rec/data-processing"))}
     assert set(texts) == set(_all_on()) - only_for_dso
     assert {k[0] for k in only_for_dso} == {
@@ -168,6 +168,64 @@ def test_without_sms_the_sms_provider_need_not_be_supplied(tmp_path):
     assert legal_build.build(data, None).problems != []
 
 
+
+def _sending_contracted_by_the_community(tmp_path) -> Path:
+    data = tmp_path / "data"
+    shutil.copytree(EXAMPLE, data)
+    parties = yaml.safe_load((data / "parties.yaml").read_text())
+    for key in ("email", "sms"):
+        parties["providers"][key]["sub_processor"] = False
+    (data / "parties.yaml").write_text(yaml.safe_dump(parties, allow_unicode=True, sort_keys=False))
+    return data
+
+
+def test_a_provider_the_community_contracts_is_not_listed_as_a_sub_processor(tmp_path):
+    """Email and SMS sent on the community's own account: the platform's lists leave them out."""
+    on = _all_on()
+    texts = _texts(_sending_contracted_by_the_community(tmp_path))
+    for name in ("Example Mail SA", "Example SMS SAS"):
+        for key in (("platform/sub-processors", "it"), ("platform/sub-processors", "en"),
+                    ("example-rec-2/data-processing-agreement", "en"),
+                    ("example-rec-2/app-privacy-notice", "it"), ("example-rec-2/app-privacy-notice", "en")):
+            assert name in on[key], (key, name)
+            assert name not in texts[key], (key, name)
+    assert "  - Example Cloud Ltd, per l'hosting nell'Unione europea;\n- **Example Maps" in \
+        texts[("example-rec-2/app-privacy-notice", "it")]
+
+
+def test_the_research_notice_is_the_platform_operators_for_the_project():
+    on, off = _all_on(), _texts(off=("document_extraction",))
+    for lang, phrases in (
+            ("it", ["I tuoi dati saranno trattati da Example Platform S.r.l. in Italia",
+                    "- progetto di ricerca EXAMPLE, Grant Agreement n. 000000000.", "30 novembre 2027",
+                    "dpo@platform.example.org", "attraverso la pagina online di raccolta dei dati."]),
+            ("en", ["Your data will be processed by Example Platform S.r.l. in Italy",
+                    "- the EXAMPLE research project, Grant Agreement No. 000000000.", "30 November 2027",
+                    "dpo@platform.example.org", "through the online data collection page."])):
+        text = on[("platform/research-privacy-notice", lang)]
+        for phrase in phrases:
+            assert phrase in " ".join(text.split()), (lang, phrase)
+    assert "- copie di una bolletta elettrica;" in on[("platform/research-privacy-notice", "it")]
+    assert "bolletta" not in off[("platform/research-privacy-notice", "it")]
+    assert "electricity bill" not in off[("platform/research-privacy-notice", "en")]
+
+
+def test_the_agreement_no_longer_says_the_processor_has_no_purposes_of_its_own():
+    on, off = _all_on(), _texts(off=("dso_data_exchange",))
+    with_exchange = on[("example-rec-2/data-processing-agreement", "en")]
+    without = off[("example-rec-2/data-processing-agreement", "en")]
+    for text in (with_exchange, without):
+        assert "does not use personal data processed under this agreement" not in text
+        assert "own legal basis and privacy notice" not in text
+    assert "## 4. The Processor's own processing\n\nThe Processor is a separate" in with_exchange
+    assert "## 5. Confidentiality" in with_exchange and "subject to clause 11." in with_exchange
+    assert "own processing" not in without
+    assert "## 4. Confidentiality" in without and "## 13. Law and jurisdiction" in without
+    assert "subject to clause 10." in without and "## 10. End of the service" in without
+    assert "does not use personal data processed under this agreement" in \
+        on[("example-rec/data-processing-agreement", "en")]  # 0.1, as published
+
+
 def test_an_unknown_feature_switch_is_refused():
     values, problems = legal_features.resolve(dict.fromkeys(FEATURES, True),
                                               {"LEGAL_FEATURE_SMS_VERIFICATON": "false"}, FEATURES)
@@ -197,7 +255,7 @@ def test_a_document_that_exists_only_for_an_exchange_that_is_off_is_left_out_wit
     assert result.problems == []
     assert result.omitted == {entry: "dso_data_exchange" for entry in (
         "dataspace/participation-agreement", "example-dso/data-processing-agreement",
-        "example-rec/consent-texts", "example-rec/data-sharing-agreement",
+        "example-rec/consent-texts", "example-rec-2/consent-texts", "example-rec/data-sharing-agreement",
         "example-rec/data-sharing-privacy-notice")}
     files, problems = legal_build.site(result, EXAMPLE, "sample")
     assert problems == []
@@ -225,7 +283,7 @@ def test_the_stable_site_announces_only_what_can_exist_here():
     assert problems == []
     current = {f.path: json.loads(f.text) for f in files if f.path.endswith("current.json")}
     assert current["example-rec/current.json"]["pending"] == ["privacy", "terms"]
-    assert current["platform/current.json"]["pending"] == ["sub_processors"]
+    assert current["platform/current.json"]["pending"] == ["research_notice", "sub_processors"]
 
 
 TRANSFERS = {

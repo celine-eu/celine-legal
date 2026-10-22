@@ -401,7 +401,8 @@ def past_editions(current: list[Rendered], editions: dict, data: Path) -> list[R
                     continue
                 text = (data / EDITIONS / entry_id / version / _edition_name(lang)).read_text(encoding="utf-8")
                 past.append(Rendered(entry_id, version, lang, Path(entry_id) / version / _edition_name(lang),
-                                     text, "final", published.get("published_at"), release=published.get("release")))
+                                     text, "final", published.get("published_at"), template=published.get("template"),
+                                     release=published.get("release")))
     return past
 
 
@@ -519,6 +520,15 @@ def declarations_of(text: str) -> dict | None:
     return found if isinstance(found, dict) else None
 
 
+def links_of(templates: Path, template: str | None, lang: str) -> list[dict]:
+    """The references a template version declares for its page in one language: its
+    ``links.yaml`` (``templates/README.md``, "Links between texts"). Not part of the text."""
+    path = templates / "documents" / template / "links.yaml" if template else None
+    if path is None or not path.exists():
+        return []
+    return (_load_yaml(path) or {}).get(lang) or []
+
+
 def title_of(text: str, default: str) -> str:
     """A text's first ``# `` heading, past its front matter."""
     match = _FRONT.match(text)
@@ -539,8 +549,10 @@ def _first(by_lang: dict) -> dict:
     return next(iter(by_lang.values()))
 
 
-def site(result: Build, data: Path, mode: str, label: dict | None = None) -> tuple[list[SiteFile], list[str]]:
-    """Every file the legal host serves, from a build. Pure apart from reading the data.
+def site(result: Build, data: Path, mode: str, label: dict | None = None,
+         templates: Path = TEMPLATES) -> tuple[list[SiteFile], list[str]]:
+    """Every file the legal host serves, from a build. Pure apart from reading the data and
+    the templates' ``links.yaml``.
 
     ``label`` names what is served, in every ``current.json``: ``{"revision": <commit>}`` for a
     draft, ``{"release": "vX.Y.Z"}`` for a stable release.
@@ -560,6 +572,9 @@ def site(result: Build, data: Path, mode: str, label: dict | None = None) -> tup
             files.append(SiteFile(f"{base}/consent-texts.yaml", rendered.text))
             continue
         files.append(SiteFile(f"{base}/{rendered.lang}.md", rendered.text))
+        declared = links_of(templates, rendered.template, rendered.lang)
+        if declared:
+            files.append(SiteFile(f"{base}/{rendered.lang}.links.json", json.dumps(declared, ensure_ascii=False) + "\n"))
         entry = entries[rendered.entry_id]
         pages.setdefault((rendered.entry_id, rendered.version), {})[rendered.lang] = {
             "path": f"/{base}/{rendered.lang}/",
@@ -719,7 +734,7 @@ def render(data: Path, mode: str, offers: Path | None = None, templates: Path = 
     result = build(data, offers, templates, environ) if mode != FINAL else stable(data, templates, environ)
     if result.problems:
         return result, [], result.problems
-    files, problems = site(result, data, mode, label)
+    files, problems = site(result, data, mode, label, templates)
     return result, files, problems
 
 

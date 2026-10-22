@@ -1,0 +1,6 @@
+# The references the legal host links on this text's page (templates/README.md, "Links
+# between texts"). Not part of the text: its sha256 is the same with or without them.
+en:
+  - {find: 'privacy notice for the platform, §6', slot: privacy, anchor: sec-6}
+  - {find: 'clause (\d+)', anchor: 'sec-{1}'}
+  - {find: 'Annex (\d+)', anchor: 'annex-{1}'}

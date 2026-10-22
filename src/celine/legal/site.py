@@ -20,6 +20,11 @@ so a link an application already holds keeps working.
 
 One organisation's view never lists another's documents; only a sample host's catalogue
 lists them all, for review.
+
+A text's page links what the text refers to, without changing the text: its numbered
+headings get stable anchors (``#sec-5``, ``#sec-2-1``, ``#annex-3``), and the references its
+template version declares (``links.yaml``, laid out beside the text as ``<lang>.links.json``)
+become links to that anchor or to the slot of the document they name.
 """
 
 from __future__ import annotations
@@ -27,6 +32,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
+from html import escape
 from typing import Any
 from urllib.parse import urlencode, urlsplit
 
@@ -325,6 +331,7 @@ class Site:
         match = _FRONT.match(raw)
         body = match.group(2) if match else raw
         title = next((line[2:].strip() for line in body.splitlines() if line.startswith("# ")), slot)
+        html = self._link(render(body), edition["texts"][lang], owner)
         return Result(view={
             "view": "document",
             "slot": url_name(slot),
@@ -341,7 +348,7 @@ class Site:
                           "url": self._document_url(owner, slot, v["version"], None)} for v in versions],
             "title": title,
             "markdown": body,
-            "html": render(body),
+            "html": html,
             "text": edition["texts"][lang],
             "sha256": edition["sha256"].get(lang),
             "approval_sha256": (current.get("approval_sha256") or {}).get(lang) if version == current["version"] else None,
@@ -356,16 +363,42 @@ class Site:
         if raw is None:
             return Result(404)
         match = _FRONT.match(raw)
+        owner = self.organisation(entry_id.split("/", 1)[0]) or self.platform
+        html = self._link(render(match.group(2) if match else raw), page["text"], owner)
         return Result(view={"view": "document", "slot": None, "organisation": None, "id": entry_id,
                             "version": version, "current_version": version, "is_current": True,
                             "document_status": page.get("status"), "published_at": page.get("published_at"),
                             "acceptance": page.get("acceptance"),
                             "lang": lang, "langs": [], "versions": [], "title": page.get("title"),
                             "markdown": match.group(2) if match else raw,
-                            "html": render(match.group(2) if match else raw), "text": page["text"],
+                            "html": html, "text": page["text"],
                             "sha256": page.get("sha256"),
                             "approval_sha256": page.get("approval_sha256") if page.get("status") != "final" else None,
                             "url": None})
+
+    def _link(self, html: str, text_path: str, owner: Owner | None) -> str:
+        """The page of a text, its declared references linked (``<lang>.links.json``)."""
+        declared = self.text(re.sub(r"\.md$", ".links.json", text_path))
+        if not declared:
+            return html
+        rules = []
+        for rule in json.loads(declared):
+            href = self._href(rule, owner)
+            if href is not None:
+                rules.append((rule["find"], href))
+        return link(html, rules)[0]
+
+    def _href(self, rule: dict, owner: Owner | None) -> str | None:
+        """Where a reference points: a heading of this text, or a slot (the owner's, else the
+        platform's) and a heading there. None when no such slot exists here."""
+        anchor = f"#{rule['anchor']}" if rule.get("anchor") else ""
+        slot = rule.get("slot")
+        if not slot:
+            return anchor or None
+        target = next((o for o in (owner, self.platform) if o is not None and o.has(slot)), None)
+        if target is None:
+            return None
+        return self.base + self._slot_url(target, slot) + anchor
 
     def _listing(self, owner: Owner | None, request: Request) -> list[dict]:
         if owner is None:
@@ -391,8 +424,66 @@ class Site:
 
 
 def render(body: str) -> str:
-    """A text as HTML, as the build renders its pages (the same extensions)."""
-    return markdown.markdown(body, extensions=["tables", "sane_lists"], output_format="html")
+    """A text as HTML, as the build renders its pages (the same extensions), each numbered
+    heading with its anchor."""
+    return _HEADING.sub(_anchor, markdown.markdown(body, extensions=["tables", "sane_lists"], output_format="html"))
+
+
+# A numbered heading: "5. Uso corretto", "2.1 La domanda", "Annex 3 — …", "Allegato 3 — …".
+_HEADING = re.compile(r"<(h[2-4])>(?:(\d+(?:\.\d+)*)\.?\s|(?:Annex|Allegato)\s+(\d+)\b)")
+
+
+def _anchor(match: re.Match) -> str:
+    tag, number, annex = match.groups()
+    anchor = f"annex-{annex}" if annex else "sec-" + number.replace(".", "-")
+    return match.group(0).replace(f"<{tag}>", f'<{tag} id="{anchor}">', 1)
+
+
+# Text the links never enter: inside a link already, a heading, code.
+_SKIP = {"a", "h1", "h2", "h3", "h4", "h5", "h6", "code", "pre"}
+
+
+def link(html: str, rules: list[tuple[str, str]]) -> tuple[str, list[int]]:
+    """``html`` with every match of each rule's ``find`` linked to its ``href``, in text only
+    (never in a tag, a link, a heading or code). ``find`` is a regular expression in which a
+    space matches any whitespace; ``{1}`` in ``href`` is its first group, dots written as
+    dashes (``2.1`` → ``sec-2-1``). Also returns how often each rule matched."""
+    if not rules:
+        return html, []
+    compiled = [(re.compile(find.replace(" ", r"\s+")), href) for find, href in rules]
+    counts = [0] * len(compiled)
+    out, depth = [], 0
+    for part in re.split(r"(<[^>]+>)", html):
+        if part.startswith("<"):
+            name = re.match(r"</?([a-zA-Z0-9]+)", part)
+            if name and name.group(1).lower() in _SKIP:
+                depth += -1 if part.startswith("</") else 1
+            out.append(part)
+            continue
+        if depth == 0:
+            part = _link_text(part, compiled, counts)
+        out.append(part)
+    return "".join(out), counts
+
+
+def _link_text(text: str, compiled: list, counts: list[int]) -> str:
+    """One text node, linked: the earliest match first, and a linked span never again. Each
+    search sees the whole node, so a lookbehind reads past an earlier link."""
+    out, pos = [], 0
+    while pos < len(text):
+        found = [(m.start(), i, m) for i, (pattern, _) in enumerate(compiled) if (m := pattern.search(text, pos))]
+        found = [f for f in found if f[2].end() > f[2].start()]
+        if not found:
+            break
+        _, i, m = min(found, key=lambda f: (f[0], f[1]))
+        href = compiled[i][1]
+        if m.groups() and m.group(1) is not None:
+            href = href.replace("{1}", m.group(1).replace(".", "-"))
+        counts[i] += 1
+        out.append(text[pos:m.start()] + f'<a href="{escape(href, quote=True)}">{m.group(0)}</a>')
+        pos = m.end()
+    out.append(text[pos:])
+    return "".join(out)
 
 
 def _public(about: dict) -> dict:

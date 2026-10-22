@@ -1,0 +1,18 @@
+# The references the legal host links on this text's page (templates/README.md, "Links
+# between texts"). Not part of the text: its sha256 is the same with or without them.
+it:
+  - {find: 'informativa generale di [^<]+? per i soci', slot: member_privacy_notice}
+  - {find: 'informativa «Condivisione dei tuoi dati di misura»', slot: data_sharing_notice}
+  - {find: 'condizioni d''uso', slot: terms}
+  - {find: 'regolamento della comunità', slot: regulations}
+  - {find: 'elenco dei sub-responsabili della piattaforma', slot: sub_processors}
+  - {find: '(?<=punti\s)(2\.1)', anchor: 'sec-{1}'}
+  - {find: '(?<=\se\s)(2\.2)(?=\sservono)', anchor: 'sec-{1}'}
+  - {find: '§(\d+(?:\.\d+)?)', anchor: 'sec-{1}'}
+en:
+  - {find: 'general privacy notice for members', slot: member_privacy_notice}
+  - {find: 'notice "Sharing your meter readings"', slot: data_sharing_notice}
+  - {find: 'terms of use', slot: terms}
+  - {find: 'community rules', slot: regulations}
+  - {find: 'sub-processor list', slot: sub_processors}
+  - {find: '§(\d+(?:\.\d+)?)', anchor: 'sec-{1}'}

@@ -1,0 +1,106 @@
+{% import 'macros/text.j2' as text %}
+---
+document: research-privacy-notice
+scope: platform
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Notice on the processing of personal data — EU {{ project.name }} Project
+
+**Version {{ doc.version }}**
+
+{% call text.wrap() %}{{ platform.short }} is committed to protecting the personal data entrusted to it. Their management and security are therefore ensured with the utmost care, as required by data protection law (Regulation (EU) 2016/679 - GDPR and Italian Legislative Decree 196/2003).{% endcall %}
+
+This notice explains who we are, for which purposes we use your data, how we manage it,
+to whom it is disclosed and what your rights are.
+
+## 1. Who will process my data?
+
+{% call text.wrap() %}Your data will be processed by {{ platform.name }} in {{ platform.country.en }}, with registered office at {{ platform.registered_office }}.{% endcall %}
+
+{% call text.wrap() %}For more information, you can contact the company at: {{ platform.pec }}.{% endcall %}
+
+{% call text.wrap() %}{{ text.poss(platform.short) }} Data Protection Officer, appointed by the controller, can be contacted by email at: {{ platform.dpo }}.{% endcall %}
+
+## 2. Which data will be processed?
+
+- identification and contact data (name, tax code, email, phone, address);
+- point of delivery (POD) and supply address;
+{% if features.document_extraction %}
+- copies of an electricity bill;
+{% endif %}
+- energy data from meters and devices, and data derived from it (forecasts, suggestions,
+  commitments, points).
+
+## 3. Why do you need my data?
+
+{{ platform.short }} will use your data solely for the following purpose:
+
+- the {{ project.name }} research project, Grant Agreement No. {{ project.grant_agreement }}.
+
+We will not process data beyond what the purposes pursued require, and we will not use
+your data for purposes other than those described in this notice.
+
+## 4. How will you use my data?
+
+{% call text.wrap() %}{{ platform.short }} aims to protect the personal data entrusted to it, processing it in accordance with the principles of fairness, lawfulness and transparency.{% endcall %}
+
+Your data will therefore be processed with tools and procedures suitable for ensuring
+the utmost security and confidentiality, in archives, with the help of digital media and
+computer and telematic means.
+
+## 5. How long will you keep my data?
+
+{% call text.wrap() %}The data collected will be kept for as long as needed for the purposes above, and in any case no later than the end of the project, scheduled for {{ text.date(project.end, 'en') }}. At the end of that period, all personal data processed will be deleted.{% endcall %}
+
+## 6. Will you share my information with others?
+
+{% call text.wrap() %}Following the collection of the data by {{ platform.short }}, the personal data relating to this processing will not be disclosed to third parties.{% endcall %}
+
+## 7. What are my rights?
+
+With regard to the data processed by the controller, you may exercise the following
+rights:
+
+- to be informed of the processing of your personal data and, where applicable, to
+  receive a copy of it: the data subject's right of access (Art. 15 of the EU
+  Regulation);
+- to have inaccurate personal data concerning you corrected: the right to rectification
+  (Art. 16 of the EU Regulation);
+- to have your personal data erased without undue delay: the right to be forgotten
+  (Art. 17 of the EU Regulation);
+- to restrict the processing of your personal data. Where certain conditions apply, you
+  may ask for the processing of your data to be restricted; the controller will then not
+  process the data for any purpose other than storing it (Art. 18 of the EU Regulation);
+- to receive your data, or have it transmitted to another controller (Art. 20 of the EU
+  Regulation);
+- to object to the processing of your data. You may object to the processing of your
+  data where it is based on a legal basis other than consent (Art. 21 of the EU
+  Regulation);
+- not to be subject to automated decision-making (Art. 22 of the EU Regulation).
+
+Further information on the data subject's rights is available at
+www.garanteprivacy.it.
+
+These rights can be exercised as provided by the Regulation:
+
+{% call text.wrap('- ') %}by email to {{ platform.pec }} or {{ platform.dpo }};{% endcall %}
+{% call text.wrap('- ') %}by registered letter with return receipt to the controller's registered office at {{ platform.registered_office }}.{% endcall %}
+
+Under Art. 7 of the EU Regulation, withdrawing consent does not affect the lawfulness of
+processing based on consent before its withdrawal. A data subject who believes their
+rights have been infringed has the right to lodge a complaint with the Italian Data
+Protection Authority (Garante per la protezione dei dati personali), as the Authority
+indicates at www.garanteprivacy.it.
+
+## 8. Automated decision-making
+
+{% call text.wrap() %}{{ platform.short }} does not carry out any processing of personal data that consists of automated decision-making.{% endcall %}
+
+## 9. Legal basis
+
+The legal basis of the processing above is:
+
+{% call text.wrap('- ') %}Art. 6(1)(a) GDPR: the data subject has consented to the processing of their personal data for the specific purpose, through the online data collection page.{% endcall %}

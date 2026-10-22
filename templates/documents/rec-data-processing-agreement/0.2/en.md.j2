@@ -1,0 +1,280 @@
+{# A name closing a sentence: one full stop, also after "S.p.A.". #}
+{% macro dot(name) %}{{ name }}{{ "" if name.endswith(".") else "." }}{% endmacro %}
+{# Possessive of a name: "Acme's", "Labs'". #}
+{% macro poss(name) %}{{ name }}{{ "'" if name.endswith("s") else "'s" }}{% endmacro %}
+{# A party's address line: the registered office, then the country once there is one. #}
+{% macro address(p) %}{{ p.registered_office }}{% if p.registered_office != "[•]" %}, {{ p.country.en }}{% endif %}{% endmacro %}
+{% macro tax(p) %}{% if p.tax_code != "[•]" and p.vat is defined and p.vat == p.tax_code %}Tax code and VAT: {{ p.tax_code }}{% elif p.tax_code != "[•]" and p.vat is defined and p.vat != "[•]" %}Tax code: {{ p.tax_code }}; VAT: {{ p.vat }}{% else %}Tax code {{ p.tax_code }}{% endif %}{% endmacro %}
+{% macro region(p) %}{{ "European Union" if p.region == "eu" else p.region }}{% endmacro %}
+{# The consents under which the platform operator receives readings as a controller of
+   its own: the offers whose recipient is the platform operator, by their titles. Without
+   any, section 4 is left out and the sections after it are renumbered. #}
+{% set titles = [] %}
+{% if features.dso_data_exchange %}
+{% for o in offers if party_by_alias[o.recipients.recipient] is sameas platform %}
+{% set _ = titles.append('"' ~ consent_texts.texts[o.id][doc.lang].title ~ '"') %}
+{% endfor %}
+{% endif %}
+{% set skip = 0 if features.dso_data_exchange and titles else 1 %}
+---
+document: data-processing-agreement
+rec: {{ rec.key }}
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Data processing agreement
+
+**Under Article 28 of Regulation (EU) 2016/679 (GDPR) — version {{ doc.version }}**
+
+## Parties
+
+- **Controller: {{ dot(rec.name) }}**
+  - Address: {{ address(rec) }}.
+  - {{ tax(rec) }}.
+  - Represented by {{ rec.representative }}.
+- **Processor: {{ dot(platform.name) }}**
+  - Address: {{ address(platform) }}.
+  - {{ tax(platform) }}.
+  - Represented by {{ platform.representative }}.
+
+## 1. Subject matter
+
+The Processor operates {{ poss(rec.short) }} digital community platform. This agreement sets
+out the terms on which the Processor processes personal data on the Controller's behalf
+in doing so. Annex 1 describes the processing. Annex 2 lists the security measures and
+Annex 3 the sub-processors.
+
+## 2. Duration
+
+This agreement applies for as long as the Processor operates the platform for the
+Controller. It ends when that service ends, subject to clause {{ 11 - skip }}.
+
+## 3. Instructions
+
+The Processor processes the personal data only on the Controller's documented
+instructions, including for any transfer outside the European Economic Area. This
+agreement and the platform's configuration agreed with the Controller are those
+instructions. The only exception is where Union or Member State law requires otherwise;
+the Processor then informs the Controller before processing, unless that law prohibits
+it.
+
+The Processor informs the Controller immediately if, in its opinion, an instruction
+infringes data protection law.
+
+{% if features.dso_data_exchange and titles %}
+## 4. The Processor's own processing
+
+{% filter wordwrap(88, break_long_words=False, break_on_hyphens=False) %}
+The Processor is a separate, independent controller of the meter readings it receives under a member's consent to {{ titles[:-1] | join(", ") }}{% if titles | length > 1 %} and {% endif %}{{ titles[-1] }} for {{ platform.short }}. That processing is governed by the member meter data sharing agreement and by the consent, not by this agreement. The Processor keeps it technically and organisationally separate from the processing under this agreement.
+{% endfilter +%}
+
+{% endif %}
+## {{ 5 - skip }}. Confidentiality
+
+The Processor ensures that every person authorised to process the personal data:
+
+- has committed to confidentiality, or is under a statutory obligation of
+  confidentiality;
+- has access only to what their task requires.
+
+## {{ 6 - skip }}. Security
+
+The Processor implements the technical and organisational measures in Annex 2, and
+keeps them appropriate to the risk (Article 32 GDPR). It may replace a measure with one
+that is at least as effective, and informs the Controller of material changes.
+
+## {{ 7 - skip }}. Sub-processors
+
+The Controller gives general authorisation for the sub-processors in Annex 3.
+
+**Adding or replacing a sub-processor:**
+
+- The Processor informs the Controller at least 30 days in advance.
+- The Controller may object on reasonable data-protection grounds within that period.
+- If the objection cannot be resolved, the Controller may end the service without
+  penalty.
+
+**Obligations passed on:** the Processor imposes on each sub-processor, by contract,
+the same data-protection obligations as in this agreement. It remains fully liable to
+the Controller for each sub-processor's performance.
+
+{% set xfer = namespace(items=[]) %}{% for key, p in providers.items() if (key != 'sms' or features.sms_verification) and p.sub_processor is defined and p.sub_processor and p.dpa_service is defined and p.dpa_service.rec is defined and p.transfers is defined %}{% set xfer.items = xfer.items + [p] %}{% endfor %}
+## {{ 8 - skip }}. Location
+
+{% if xfer.items %}
+The personal data is stored and processed in the European Economic Area:
+{% else %}
+The personal data is processed in the European Economic Area only:
+{% endif %}
+
+- on {{ providers.hosting.brand }} infrastructure in the European Union;
+- on the Processor's own infrastructure in {{ platform.city }}, {{ platform.country.en }}.
+
+{% if features.ai_assistant and features.document_extraction %}
+The language model behind the AI assistant, and behind the reading of bills and
+identity documents in the membership application, runs on the Processor's own server in
+{{ platform.city }}. No personal data is sent to an AI provider outside this agreement.
+
+{% elif features.ai_assistant %}
+The language model behind the AI assistant runs on the Processor's own server in
+{{ platform.city }}. No personal data is sent to an AI provider outside this agreement.
+
+{% elif features.document_extraction %}
+The language model behind the reading of bills and identity documents in the membership
+application runs on the Processor's own server in {{ platform.city }}. No personal data is
+sent to an AI provider outside this agreement.
+
+{% endif %}
+{% if xfer.items %}
+The sub-processors in Annex 3 whose entry states a transfer may access the personal data
+from outside the European Economic Area, only as stated there and under the safeguard it
+names (Chapter V GDPR). By agreeing Annex 3, the Controller instructs those transfers.
+
+No other transfer outside the European Economic Area takes place without the Controller's
+prior written instruction and a transfer mechanism under Chapter V GDPR.
+{% else %}
+No transfer outside the European Economic Area takes place without the Controller's
+prior written instruction and a transfer mechanism under Chapter V GDPR.
+{% endif %}
+
+## {{ 9 - skip }}. Assistance
+
+The Processor assists the Controller, taking into account the nature of the processing:
+
+- **Data subjects' rights:** in responding to requests under Articles 15–22 GDPR. It
+  forwards to the Controller, within 5 working days, any request it receives directly,
+  and does not answer it itself unless instructed.
+- **Other obligations:** in meeting the obligations of Articles 32–36 GDPR, including
+  data protection impact assessments and prior consultation.
+
+## {{ 10 - skip }}. Personal data breaches
+
+The Processor notifies the Controller of a personal data breach without undue delay,
+and in any case within **24 hours** of becoming aware of it.
+
+**What the notice contains**, as far as known at the time (Article 33(3) GDPR):
+
+- the nature of the breach;
+- the categories and approximate numbers of data subjects and records concerned;
+- its likely consequences;
+- the measures taken or proposed.
+
+Information not yet available follows as soon as it is.
+
+## {{ 11 - skip }}. End of the service
+
+When the service ends, the Processor, at the Controller's choice:
+
+- returns the personal data to the Controller in a common machine-readable format;
+- or deletes it.
+
+The Processor then deletes the remaining copies within 60 days, including backups when
+they expire. The only exception is where Union or Member State law requires retention.
+The Processor confirms the deletion in writing.
+
+## {{ 12 - skip }}. Records, audits and inspections
+
+**Records:** the Processor keeps the record of processing activities required by
+Article 30(2) GDPR.
+
+**Information:** it makes available to the Controller the information needed to
+demonstrate compliance with this agreement.
+
+**Audits:**
+
+- The Processor allows and contributes to audits by the Controller or an auditor it
+  mandates, bound by confidentiality.
+- Notice: at least 15 working days, except after a breach.
+- Frequency: once a year at most, except after a breach or at an authority's request.
+
+## {{ 13 - skip }}. Liability
+
+Each party is liable as provided by Article 82 GDPR.
+
+## {{ 14 - skip }}. Law and jurisdiction
+
+This agreement is governed by Italian law. The courts of {{ platform.forum.en }} have exclusive
+jurisdiction.
+
+## Annex 1 — Description of the processing
+
+| | |
+|---|---|
+| **Services** | Online membership application{{ ', including the reading of an uploaded bill and identity document by a language model' if features.document_extraction else '' }}; community app (energy overview, forecasts, suggestions, commitments, points, notifications, feedback){{ '; AI assistant' if features.ai_assistant else '' }}; login and account management{{ "; the Controller's dataspace connector and identity" if features.dso_data_exchange else '' }}; community console for the Controller's staff |
+| **Nature** | Hosting, storage, computation, display, transmission, backup and deletion |
+| **Purposes** | Those set out in the Controller's privacy notice for the platform{{ ' and in its notice on sharing meter readings' if features.dso_data_exchange else '' }}, for the Controller's part |
+| **Data subjects** | Applicants and members of the community; the Controller's staff using the console |
+| **Categories of data** | Identification and contact data (name, tax code, email, phone, address); supply point (POD) and supply address{{ "; copies of an electricity bill and of an identity document, kept until the member's account is activated, and the data read from them (besides the identification data and supply point above: the municipality and the document's expiry date)" if features.document_extraction else '' }}; declared energy equipment; meter and device energy data and data derived from it (forecasts, suggestions, commitments, points); account and login data; notification preferences and delivery records;{{ ' AI assistant messages and attachments;' if features.ai_assistant else '' }} feedback, including screenshots and technical data; records of acceptances and consents{{ "; the member's dataspace identifier" if features.dso_data_exchange else '' }} |
+| **Special categories** | None intended{{ '. Members are asked not to provide any to the assistant' if features.ai_assistant else '' }} |
+| **Retention** | As in the Controller's privacy notice for the platform, §6 |
+
+## Annex 2 — Technical and organisational measures
+
+**Access and identity:**
+
+- Single sign-on for every application.
+- Access by role, enforced by policy on each service.
+- Members see only their own data.
+- Staff see only their community.
+- Multi-factor authentication for administrative accounts.
+
+**Encryption:**
+
+- In transit: TLS on every external connection.
+- At rest: storage encrypted at rest. Identification data in the membership application
+  is also encrypted per field{{ ', and uploaded documents are encrypted per file' if features.document_extraction else '' }}.
+- Secrets: kept encrypted, never in clear in source control.
+
+**Separation:**
+
+- Each community's data is separated by the community identifier and the access
+  policies.
+- {{ poss(platform.short) }} own research data is kept in separate stores.
+
+**Logging:**
+
+- Administrative actions in the membership application are recorded in an audit log.
+{% if features.dso_data_exchange %}
+- Every consent decision and every dataspace disclosure is recorded in the dataspace's
+  provenance record.
+{% endif %}
+
+**Availability:**
+
+- Database backups within the European Economic Area.
+- Restore procedures are tested.
+
+**People:**
+
+- Confidentiality commitments.
+- Least-privilege access for the Processor's staff.
+- Access is removed when a person leaves.
+
+**Development:**
+
+- Changes are reviewed before deployment.
+- Dependencies are kept up to date.
+
+## Annex 3 — Authorised sub-processors
+
+{% if xfer.items %}
+| Sub-processor | Service | Location | Transfers outside the EEA |
+|---|---|---|---|
+{% else %}
+| Sub-processor | Service | Location |
+|---|---|---|
+{% endif %}
+{% for key, p in providers.items() if (key != 'sms' or features.sms_verification) and p.sub_processor is defined and p.sub_processor and p.dpa_service is defined and p.dpa_service.rec is defined %}
+| {{ p.name }}{% if p.address is defined %}, {{ p.address }}{% endif %} | {{ p.dpa_service.rec.en }} | {{ region(p) }} |{% if xfer.items %} {{ p.transfers.en if p.transfers is defined else 'None' }} |{% endif +%}
+{% endfor %}
+
+## Signatures
+
+{# Signature cells are filled in by hand at signing: a draft shows the blank, a final edition an empty cell. #}
+{% set to_sign = '' if doc.status == 'final' else '[•]' %}
+| Party | Name and role | Date | Signature |
+|---|---|---|---|
+| {{ rec.short }} (Controller) | {{ to_sign }} | {{ to_sign }} | |
+| {{ platform.short }} (Processor) | {{ to_sign }} | {{ to_sign }} | |

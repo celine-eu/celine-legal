@@ -1,0 +1,109 @@
+{% import 'macros/text.j2' as text %}
+---
+document: research-privacy-notice
+scope: platform
+status: {{ doc.status }}
+version: "{{ doc.version }}"
+lang: {{ doc.lang }}
+---
+
+# Informativa al trattamento dei dati personali — Progetto EU {{ project.name }}
+
+**Versione {{ doc.version }}**
+
+{% call text.wrap() %}{{ platform.short }} è impegnata nella protezione dei dati personali che le vengono affidati. Pertanto, la loro gestione e la loro sicurezza vengono garantite con la massima attenzione, conformemente a quanto richiesto dalla normativa privacy (Regolamento UE 679/2016 - GDPR e D.lgs. 196/2003).{% endcall %}
+
+Questa informativa illustra chi siamo, per quali scopi utilizziamo i tuoi dati, come li
+gestiamo, a chi vengono comunicati e quali sono i tuoi diritti.
+
+## 1. Chi tratterà i miei dati?
+
+{% call text.wrap() %}I tuoi dati saranno trattati da {{ platform.name }} in {{ platform.country.it }}, con sede in {{ platform.registered_office }}.{% endcall %}
+
+{% call text.wrap() %}Per maggiori informazioni è possibile contattare la società al seguente indirizzo: {{ platform.pec }}.{% endcall %}
+
+{% call text.wrap() %}Il Responsabile della protezione dei dati di {{ platform.short }}, nominato dal Titolare del trattamento, può essere contattato via e-mail al seguente indirizzo: {{ platform.dpo }}.{% endcall %}
+
+## 2. Quali dati verranno trattati?
+
+- dati di identificazione e di contatto (nome, codice fiscale, e-mail, telefono,
+  indirizzo);
+- punto di prelievo (POD) e indirizzo di fornitura;
+{% if features.document_extraction %}
+- copie di una bolletta elettrica;
+{% endif %}
+- dati energetici di misuratori e dispositivi e dati derivati da essi (previsioni,
+  suggerimenti, impegni, punti).
+
+## 3. Perché avete bisogno dei miei dati?
+
+{{ platform.short }} utilizzerà i tuoi dati esclusivamente per la seguente finalità:
+
+- progetto di ricerca {{ project.name }}, Grant Agreement n. {{ project.grant_agreement }}.
+
+Eviteremo il trattamento di dati eccedenti rispetto alle finalità perseguite e non
+utilizzeremo i tuoi dati per finalità diverse e ulteriori rispetto a quelle descritte
+nella presente informativa.
+
+## 4. Come utilizzerete i miei dati?
+
+{% call text.wrap() %}{{ platform.short }} ha come obiettivo la tutela dei dati personali che le vengono affidati, improntando il loro trattamento ai principi di correttezza, di liceità e trasparenza.{% endcall %}
+
+Ti informiamo pertanto che i tuoi dati saranno trattati tramite l'utilizzo di strumenti
+e procedure idonei a garantire la massima sicurezza e riservatezza, mediante archivi, con
+l'ausilio di supporti digitali, mezzi informatici e telematici.
+
+## 5. Quanto tempo conserverete i miei dati?
+
+{% call text.wrap() %}I dati raccolti verranno conservati per il tempo utile all'esecuzione delle finalità sopraindicate, e comunque non oltre il termine del progetto previsto per il {{ text.date(project.end, 'it') }}. Al termine del periodo indicato, tutti i dati personali trattati verranno cancellati.{% endcall %}
+
+## 6. Condividerete le mie informazioni con altri soggetti?
+
+{% call text.wrap() %}A seguito della raccolta dei dati effettuata da {{ platform.short }}, i dati personali relativi al trattamento in questione non saranno comunicati a terze parti.{% endcall %}
+
+## 7. Quali sono i miei diritti?
+
+Potrai esercitare, con riferimento ai dati trattati dal Titolare, i seguenti diritti:
+
+- essere informato sui trattamenti effettuati sui propri dati personali ed eventualmente
+  riceverne copia, diritto di accesso dell'interessato (art. 15 del Regolamento UE);
+- rettificare i dati personali inesatti che ti riguardano, diritto di rettifica dei
+  propri dati personali (art. 16 del Regolamento UE);
+- cancellare i tuoi dati personali senza ingiustificato ritardo, diritto all'oblio
+  (art. 17 del Regolamento UE);
+- limitare il trattamento dei tuoi dati personali. Quando ricorrono determinate
+  condizioni, potrai richiedere la limitazione del trattamento dei tuoi dati, in tal caso
+  il Titolare non tratterà i dati per alcun altro scopo se non la loro conservazione
+  (art. 18 del Regolamento UE);
+- ricevere i tuoi dati o farli trasferire ad altro titolare (art. 20 del Regolamento UE);
+- opporti al trattamento dei tuoi dati. Potrai opporti al trattamento dei tuoi dati
+  quando questo avviene su una base giuridica diversa dal consenso (art. 21 del
+  Regolamento UE);
+- non essere sottoposto a processi decisionali automatizzati (art. 22 del Regolamento
+  UE).
+
+Ulteriori informazioni circa i diritti dell'interessato potranno ottenersi sul sito
+www.garanteprivacy.it.
+
+I suddetti diritti possono essere esercitati secondo quanto stabilito dal Regolamento,
+ovvero:
+
+{% call text.wrap('- ') %}inviando una e-mail a {{ platform.pec }} o {{ platform.dpo }};{% endcall %}
+{% call text.wrap('- ') %}inviando una lettera raccomandata A/R alla sede legale del Titolare in {{ platform.registered_office }}.{% endcall %}
+
+Ai sensi dell'art. 7 del Regolamento UE, la revoca del consenso non comporta pregiudizio
+sulla liceità del trattamento basata sul consenso effettuato prima dell'avvenuta revoca.
+L'interessato, qualora ritenga che i propri diritti siano stati compromessi, ha il
+diritto di proporre reclamo all'Autorità Garante per la protezione dei dati personali,
+secondo le modalità indicate dalla stessa Autorità al seguente indirizzo:
+www.garanteprivacy.it.
+
+## 8. Processi decisionali automatizzati
+
+{% call text.wrap() %}{{ platform.short }} non effettua sui dati personali trattamenti che consistono in processi decisionali automatizzati.{% endcall %}
+
+## 9. Base giuridica
+
+La base giuridica del trattamento sopraindicato è la seguente:
+
+{% call text.wrap('- ') %}art. 6.1.a del GDPR: l'interessato ha espresso il consenso al trattamento dei propri dati personali per la specifica finalità, attraverso la pagina online di raccolta dei dati.{% endcall %}

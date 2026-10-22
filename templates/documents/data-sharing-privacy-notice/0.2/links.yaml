@@ -1,0 +1,10 @@
+# The references the legal host links on this text's page (templates/README.md, "Links
+# between texts"). Not part of the text: its sha256 is the same with or without them.
+it:
+  - {find: 'informativa generale di [^<]+? per i soci', slot: member_privacy_notice}
+  - {find: 'elenco dei sub-responsabili della piattaforma', slot: sub_processors}
+  - {find: '(?<=al\spunto\s)(\d+)', anchor: 'sec-{1}'}
+en:
+  - {find: 'general privacy notice for members', slot: member_privacy_notice}
+  - {find: 'sub-processor list', slot: sub_processors}
+  - {find: '§(\d+)', anchor: 'sec-{1}'}

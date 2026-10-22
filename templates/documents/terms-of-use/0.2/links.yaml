@@ -1,0 +1,16 @@
+# The references the legal host links on this text's page (templates/README.md, "Links
+# between texts"). Not part of the text: its sha256 is the same with or without them.
+it:
+  - {find: '(?<=artt\.\s)(\d+)', anchor: 'sec-{1}'}
+  - {find: '(?<=\d\se\s)(\d+)(?=\.)', anchor: 'sec-{1}'}
+  - {find: 'art\. (\d+)(?!\d)(?!\s(?:c\.c|del|GDPR))', anchor: 'sec-{1}'}
+  - {find: 'informativa privacy', slot: privacy}
+  - {find: 'regolamento della comunità', slot: regulations}
+  - {find: 'statuto', slot: statute}
+en:
+  - {find: '(?<=Arts\.\s)(\d+)', anchor: 'sec-{1}'}
+  - {find: '(?<=\d\sand\s)(\d+)(?=\.)', anchor: 'sec-{1}'}
+  - {find: 'Art\. (\d+)(?!\d)(?!\s(?:of|GDPR))', anchor: 'sec-{1}'}
+  - {find: 'privacy notice', slot: privacy}
+  - {find: 'rules of the energy community', slot: regulations}
+  - {find: 'statute', slot: statute}

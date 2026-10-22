@@ -132,9 +132,9 @@ def test_each_community_has_its_own_current_set():
     first = json.loads(site["example-rec/current.json"])["slots"]
     second = json.loads(site["example-rec-2/current.json"])["slots"]
     assert first["privacy"]["paths"]["it"] == "/example-rec/app-privacy-notice/0.1/it/"
-    assert second["privacy"]["paths"]["it"] == "/example-rec-2/app-privacy-notice/0.1/it/"
+    assert second["privacy"]["paths"]["it"] == "/example-rec-2/app-privacy-notice/0.2/it/"
     assert first["privacy"]["sha256"] != second["privacy"]["sha256"]
-    assert "Example REC 2" in site["example-rec-2/app-privacy-notice/0.1/it.md"]
+    assert "Example REC 2" in site["example-rec-2/app-privacy-notice/0.2/it.md"]
     assert "Example REC 2" not in site["example-rec/app-privacy-notice/0.1/it.md"]
 
 
