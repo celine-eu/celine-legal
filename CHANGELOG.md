@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.6.1 (2026-10-22)
+
+### Bug Fixes
+
+- Optional dpo, doc linking
+  ([`fa96649`](https://github.com/celine-eu/celine-legal/commit/fa96649f14faa3e9ae1b8dbe9c746a8cd783751b))
+
+
 ## v0.6.0 (2026-10-22)
 
 ### Features
