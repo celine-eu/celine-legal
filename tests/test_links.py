@@ -124,3 +124,41 @@ def test_a_published_edition_links_as_its_draft_did(tmp_path):
     assert problems == []
     html = _html("/privacy/example-rec-2/0.2/it", Site({f.path: f.text for f in files}))
     assert '<a href="/sub-processors">elenco dei sub-responsabili della piattaforma</a>' in html
+
+
+def test_the_platform_notice_links_the_research_notice_where_it_is_published(tmp_path):
+    assert '<a href="/research-notice">Informativa al trattamento dei dati personali — Progetto EU EXAMPLE</a>' in \
+        _html("/privacy/example-rec-2/0.2/it")
+    assert '<a href="/research-notice">Notice on the processing of personal data — EU EXAMPLE Project</a>' in \
+        _html("/privacy/example-rec-2/0.2/en")
+    data = tmp_path / "data"
+    shutil.copytree(EXAMPLE, data)
+    register = yaml.safe_load((data / "register.yaml").read_text())
+    del register["platform_roles"]["research_notice"]
+    (data / "register.yaml").write_text(yaml.safe_dump(register, allow_unicode=True, sort_keys=False))
+    texts = {(f.entry_id, f.lang): f.text for f in legal_build.build(data, None).files if f.lang}
+    assert "Progetto EU" not in texts[("example-rec-2/app-privacy-notice", "it")]
+    assert "EU EXAMPLE Project" not in texts[("example-rec-2/app-privacy-notice", "en")]
+
+
+def test_a_community_without_a_dpo_names_none(tmp_path):
+    data = tmp_path / "data"
+    shutil.copytree(EXAMPLE, data)
+    identity_path = data / "recs" / "example-rec" / "identity.yaml"
+    identity = yaml.safe_load(identity_path.read_text())
+    dpo = identity.pop("dpo")
+    identity_path.write_text(yaml.safe_dump(identity, allow_unicode=True, sort_keys=False))
+    register_path = data / "register.yaml"  # 0.1, as published, still names one
+    register = yaml.safe_load(register_path.read_text())
+    for entry in register["documents"]:
+        if entry["id"] == "example-rec/app-privacy-notice":
+            entry["version"] = "0.2"
+    register_path.write_text(yaml.safe_dump(register, allow_unicode=True, sort_keys=False))
+    result = legal_build.build(data, None)
+    assert result.problems == []
+    texts = {(f.entry_id, f.lang): f.text for f in result.files if f.lang}
+    for lang, label in (("it", "Responsabile della protezione dei dati:"), ("en", "Data protection officer:")):
+        assert label not in texts[("example-rec/app-privacy-notice", lang)]
+    for lang in ("it", "en"):
+        sharing = " ".join(texts[("example-rec/data-sharing-privacy-notice", lang)].split())
+        assert dpo not in sharing and "Example DSO dpo@dso.example.org; Example Platform dpo@platform.example.org." in sharing

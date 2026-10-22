@@ -89,7 +89,9 @@ and is an independent controller for its own part:
 {% call text.wrap('  - ') %}Privacy contact: {{ platform.privacy_contact }}.{% endcall %}
 
 {% call text.wrap() %}
-Data protection officers: {{ rec.short }} {{ rec.dpo }}; {{ dso.short }} {{ dso.dpo }}; {{ platform.short }} {{ platform.dpo }}.
+{#- Only the parties that have appointed one. -#}
+{% set officers = [] %}{% for p in (rec, dso, platform) if p.dpo is defined %}{% set _ = officers.append(p.short ~ ' ' ~ p.dpo) %}{% endfor %}
+Data protection officers: {{ officers | join('; ') }}.
 {% endcall %}
 
 ## 2. What data

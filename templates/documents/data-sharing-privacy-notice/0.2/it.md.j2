@@ -89,7 +89,9 @@ titolare autonomo del trattamento per la propria parte:
 {% call text.wrap('  - ') %}Contatto privacy: {{ platform.privacy_contact }}.{% endcall %}
 
 {% call text.wrap() %}
-Responsabili della protezione dei dati: {{ rec.short }} {{ rec.dpo }}; {{ dso.short }} {{ dso.dpo }}; {{ platform.short }} {{ platform.dpo }}.
+{#- Only the parties that have appointed one. -#}
+{% set officers = [] %}{% for p in (rec, dso, platform) if p.dpo is defined %}{% set _ = officers.append(p.short ~ ' ' ~ p.dpo) %}{% endfor %}
+Responsabili della protezione dei dati: {{ officers | join('; ') }}.
 {% endcall %}
 
 ## 2. Quali dati

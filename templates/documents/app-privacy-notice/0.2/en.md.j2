@@ -19,6 +19,10 @@ This notice covers {{ rec.short }}'s digital platform:
 {{ rec.short }}'s general privacy notice for members still applies to your membership
 itself.{% if features.dso_data_exchange %} The separate notice "Sharing your meter readings" covers the optional sharing of
 your meter readings.{% endif +%}
+{% if 'research_notice' in platform_slots %}
+For the {{ project.name }} research project, {{ platform.short }} processes your data as a controller
+under its own "Notice on the processing of personal data — EU {{ project.name }} Project".
+{% endif %}
 
 ## 1. Who is responsible
 
@@ -28,7 +32,9 @@ The data controller is **{{ rec.name }}**.
 - Tax code and VAT: {{ rec.tax_code }}.
 - PEC: {{ rec.pec }}.
 - Privacy contact: **{{ rec.privacy_contact }}**.
+{% if rec.dpo is defined %}
 - Data protection officer: {{ rec.dpo }}.
+{% endif %}
 
 {{ rec.short }} has entrusted the operation of the platform to **{{ platform.name }}**, {{ platform.registered_office }},
 which processes your data on {{ rec.short }}'s behalf and on its instructions (Article 28

@@ -60,6 +60,7 @@ host, at startup) reads:
 | `offers`, `offers_by_id` | the sharing offers |
 | `consent_texts` | the community's rendered consent texts (documents that cite them) |
 | `features` | the optional features, each `true` or `false` (`features.yaml`) |
+| `platform_slots` | the platform's slot names (`platform_roles`), e.g. `research_notice`: a text names a platform document only where it is published |
 
 **A feature switched off takes its passages out.** Wrap every passage that describes a
 feature in `{% if features.<name> %}`, and read a value only that feature needs (the SMS

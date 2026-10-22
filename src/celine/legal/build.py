@@ -233,6 +233,9 @@ def context(
         "offers_by_id": {o["id"]: o for o in offers.get("sharing_offers") or []},
         "consent_texts": consent_texts or {},
         "features": features,
+        # The platform's slots (`platform_roles`): a text names a platform document only
+        # where the deployment publishes one.
+        "platform_slots": sorted(register.get("platform_roles") or {}),
         **actors,
     }
 

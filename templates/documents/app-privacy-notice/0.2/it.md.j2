@@ -21,6 +21,10 @@ Per il rapporto sociale resta valida l'informativa generale di {{ rec.short }} p
 La condivisione facoltativa delle misure del contatore è descritta nell'informativa
 «Condivisione dei tuoi dati di misura».
 {% endif %}
+{% if 'research_notice' in platform_slots %}
+Per il progetto di ricerca {{ project.name }}, {{ platform.short }} tratta i tuoi dati come titolare
+secondo la propria «Informativa al trattamento dei dati personali — Progetto EU {{ project.name }}».
+{% endif %}
 
 ## 1. Chi è responsabile
 
@@ -32,7 +36,9 @@ Il titolare del trattamento è **{{ rec.name }}**.
 - C.F. e P.IVA: {{ rec.tax_code }}.
 - PEC: {{ rec.pec }}.
 - Contatto privacy: **{{ rec.privacy_contact }}**.
+{% if rec.dpo is defined %}
 - Responsabile della protezione dei dati: {{ rec.dpo }}.
+{% endif %}
 
 {{ rec.short }} ha affidato la gestione della piattaforma a **{{ platform.name }}**, {{ platform.registered_office }}, che
 tratta i tuoi dati per conto di {{ rec.short }} e secondo le sue istruzioni, come responsabile
