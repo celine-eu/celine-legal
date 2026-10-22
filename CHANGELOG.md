@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.6.0 (2026-10-22)
+
+### Features
+
+- Improve privacy note, add research notice
+  ([`aa6b04f`](https://github.com/celine-eu/celine-legal/commit/aa6b04fac9170004e3e4d58dc2764dd97dfe95df))
+
+
 ## v0.5.0 (2026-10-17)
 
 ### Features
